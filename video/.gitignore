@@ -1,0 +1,5 @@
+output/stills/
+output/render.log
+output/mes_video_only.mp4
+output/mes_mix.wav
+tools/__pycache__/
