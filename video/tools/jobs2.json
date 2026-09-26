@@ -1,0 +1,103 @@
+[
+ {
+  "id": "home",
+  "sheet": "🏠 HOME",
+  "range": "B1:I52"
+ },
+ {
+  "id": "dashboard_all",
+  "sheet": "📊 DASHBOARD",
+  "range": "A1:T82"
+ },
+ {
+  "id": "oee",
+  "sheet": "📈 OEE DASHBOARD",
+  "range": "A1:T62"
+ },
+ {
+  "id": "arch",
+  "sheet": "🏗️ ARCHITECTURE",
+  "range": "A1:D36"
+ },
+ {
+  "id": "master",
+  "sheet": "🔗 MASTER TRACEABILITY",
+  "range": "A1:R30"
+ },
+ {
+  "id": "master_status",
+  "sheet": "🔗 MASTER TRACEABILITY",
+  "range": "BK1:BY30"
+ },
+ {
+  "id": "raw_prod",
+  "sheet": "📥 RAW Production",
+  "range": "A1:R30"
+ },
+ {
+  "id": "raw_handle",
+  "sheet": "📥 RAW Handle",
+  "range": "A1:R30"
+ },
+ {
+  "id": "raw_qc",
+  "sheet": "📥 RAW QC",
+  "range": "A1:R30"
+ },
+ {
+  "id": "raw_disp",
+  "sheet": "📥 RAW Dispatch",
+  "range": "A1:R30"
+ },
+ {
+  "id": "complaint",
+  "sheet": "🔍 COMPLAINT TOOL",
+  "range": "A1:P28"
+ },
+ {
+  "id": "trace_found",
+  "sheet": "🖨️ TRACE REPORT",
+  "range": "A1:N71"
+ },
+ {
+  "id": "trace_empty",
+  "sheet": "🖨️ TRACE REPORT",
+  "range": "A1:N71",
+  "set": [
+   [
+    "🖨️ TRACE REPORT",
+    "A7",
+    ""
+   ],
+   [
+    "🖨️ TRACE REPORT",
+    "A35",
+    ""
+   ]
+  ]
+ },
+ {
+  "id": "dashboard_chicco",
+  "sheet": "📊 DASHBOARD",
+  "range": "A1:T82",
+  "set": [
+   [
+    "📊 DASHBOARD",
+    "A6",
+    "Chicco"
+   ]
+  ]
+ },
+ {
+  "id": "reverse",
+  "sheet": "🔄 REVERSE TRACE",
+  "range": "A1:R34",
+  "set": [
+   [
+    "🔄 REVERSE TRACE",
+    "A7",
+    "PR-2026-00003"
+   ]
+  ]
+ }
+]

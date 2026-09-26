@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MES Case Study Film</title>
+<!--
+  JHS MES v3.0 — 48-second case-study film. Production specification + deterministic renderer.
+
+  HOW THIS FILE WORKS
+  • Every visual state is derived from time only: window.seek(t) (t in seconds, 0–48).
+    No CSS animations, no timers, no random state, nothing carried between frames.
+  • Open normally  → preview player (play/scrub, audio) + the full production spec below the stage.
+  • Open with ?render=1 → bare 1920×1080 stage for frame capture (tools/render_video.py).
+  • All screenshots are real renders of JHS_MES_v3_0_SIP_Unit-I.xlsx after a full recalculation
+    (LibreOffice Calc 24.2). The "empty" and "Chicco" states were produced by changing the real
+    input cells and recalculating — no UI state is faked. Keystrokes are an overlay on the real
+    cell; the state after Enter is the real recalculated workbook.
+  • Positions of highlights, the typed text and the match cut come from anchors measured in the
+    rendered PDFs (assets/screenshots/anchors.json), not from guesses.
+-->
+<style>
+@font-face{font-family:'Inter';font-weight:400;font-style:normal;src:url(assets/fonts/Inter-Regular.otf) format('opentype')}
+@font-face{font-family:'Inter';font-weight:500;font-style:normal;src:url(assets/fonts/Inter-Medium.otf) format('opentype')}
+@font-face{font-family:'Inter';font-weight:600;font-style:normal;src:url(assets/fonts/Inter-SemiBold.otf) format('opentype')}
+@font-face{font-family:'Carlito';font-weight:700;font-style:normal;src:url(assets/fonts/Carlito-Bold.ttf) format('truetype')}
+:root{
+  --bg:#08111F; --ink:#F8FAFC; --ink2:#CBD5E1; --ink3:#94A3B8; --ink4:#64748B;
+  --accent:#1D4ED8; --accent-hi:#4D7CF5; --line:rgba(255,255,255,.10);
+  --paper:#FFFFFF; --navy:#0F2A4A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#05080F;color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#viewport{position:relative;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--bg)}
+.abs{position:absolute;left:0;top:0}
+.scene{position:absolute;inset:0;display:none}
+.frame{position:absolute;overflow:hidden;background:var(--paper);border-radius:10px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06)}
+.frame img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;image-rendering:auto}
+.mask{position:absolute;overflow:hidden;white-space:nowrap}
+.mask>.in{display:inline-block;will-change:transform}
+.h1{font-weight:600;font-size:88px;letter-spacing:-.035em;line-height:1.08}
+.h2{font-weight:600;font-size:64px;letter-spacing:-.03em;line-height:1.1}
+.h3{font-weight:600;font-size:44px;letter-spacing:-.025em;line-height:1.15}
+.lab{white-space:nowrap;font-weight:500;font-size:18px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.sub{font-weight:400;font-size:28px;letter-spacing:-.01em;color:var(--ink2)}
+.cap{font-weight:500;font-size:22px;letter-spacing:-.005em;color:var(--ink)}
+.acc{color:var(--accent-hi)}
+.hl{position:absolute;border:3px solid var(--accent);border-radius:5px;background:rgba(29,78,216,.10);pointer-events:none}
+.node{position:absolute;text-align:center;transform:translateX(-50%)}
+.node .n{font-weight:600;font-size:30px;letter-spacing:-.02em}
+.node .s{font-weight:500;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:10px}
+.bar{position:absolute;height:2px;background:var(--accent-hi);transform-origin:0 50%}
+.chip{position:absolute;padding:12px 18px;border-radius:8px;background:rgba(8,17,31,.86);border:1px solid var(--line);
+  font-weight:500;font-size:22px;letter-spacing:-.005em;white-space:nowrap}
+.chip b{font-weight:600;color:var(--accent-hi)}
+.tag{position:absolute;right:48px;top:30px;font-size:15px;font-weight:500;letter-spacing:.06em;color:rgba(203,213,225,.62)}
+.cursor{position:absolute;width:30px;height:30px;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.typed{position:absolute;font-family:Carlito,Calibri,Inter,sans-serif;font-weight:700;color:#0F172A;white-space:nowrap}
+.caret{position:absolute;width:3px;background:#0F172A}
+.cover{position:absolute;inset:0;background:#000;pointer-events:none}
+/* preview chrome — not part of the film */
+#ui{padding:20px 24px;max-width:1920px;font-size:14px;color:#CBD5E1}
+#ui button{font:inherit;padding:6px 14px;border-radius:6px;border:1px solid #334155;background:#0F172A;color:#E2E8F0;cursor:pointer}
+#ui input[type=range]{width:60%;vertical-align:middle}
+#spec{padding:8px 24px 80px;max-width:1500px;color:#CBD5E1;font-size:14px;line-height:1.55}
+#spec h2{color:#F8FAFC;font-size:22px;margin:34px 0 10px;letter-spacing:-.01em}
+#spec table{border-collapse:collapse;width:100%}
+#spec td,#spec th{border-bottom:1px solid #1E293B;padding:8px 10px;vertical-align:top;text-align:left}
+#spec th{color:#94A3B8;font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+#spec code{background:#0F172A;padding:1px 5px;border-radius:4px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid #334155}
+body.render #ui,body.render #spec{display:none}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="viewport"></div></div>
+<div id="ui">
+  <button id="play">Play</button>
+  <input id="scrub" type="range" min="0" max="48" step="0.0166667" value="0">
+  <span id="tc">0.00 s · bar 1 beat 1</span>
+</div>
+<div id="spec"></div>
+<audio id="aud" preload="auto"></audio>
+
+<script>
+const STORY = {"meta": {"title": "JHS MES v3.0 — case-study film", "duration_s": 48.0, "fps": 60, "resolution": [1920, 1080], "bpm": 120, "bar_s": 2.0, "beat_s": 0.5, "music": "assets/audio/mes_score_120bpm.wav", "music_offset_note": "The renderer trims the music by analysis.json:first_downbeat_s so bar 1 beat 1 lands on t = 0", "accent": "#1D4ED8", "accent_on_dark": "#4D7CF5", "background": "#08111F", "font": "Inter (OFL) — Regular 400, Medium 500, SemiBold 600; Carlito Bold only for the typed batch number so it matches the workbook's cell font"}, "shots": [{"id": "S1", "t0": 0.0, "t1": 4.0, "bars": "1–2", "beats": "1.1 → 2.4", "section": "Hook", "visual": "Full-bleed RAW Production register (real rows: run IDs, batch numbers, handle lots) under a navy scrim; slow lateral pan", "source": "ws_raw_production.jpg", "camera": "z 0.92, pan cx 1050 → 2300 px over 4 s, ease-in-out", "transition": "Fade up from black 0–0.6 s; text masks up and out at 3.5 s; hard cut on bar 3", "text": ["KALA AMB UNIT-I  ·  TOOTHBRUSH MANUFACTURING (0.5 s)", "Every batch leaves a trail (1.0 s)", "Across moulding, production, quality and dispatch (2.0 s)"], "sound": "Score intro: pad + clock ticks", "purpose": "Establish the real shop-floor record and the idea of a trail"}, {"id": "S2", "t0": 4.0, "t1": 10.0, "bars": "3–5", "beats": "3.1 → 5.4", "section": "Old process", "visual": "Four separate RAW registers in a 2×2 grid, one per beat: Production, Handle & cap, Quality, Dispatch — each with its real record count", "source": "ws_raw_production.jpg, ws_raw_handle.jpg, ws_raw_qc.jpg, ws_raw_dispatch.jpg", "camera": "Each panel z 0.40 on the header + first rows, slow drift right", "transition": "Panels rise 24 px + fade on beats 3.1, 3.2, 3.3, 3.4; headline swaps on bars 4 and 5", "text": ["The information existed (6.0 s)", "Kept in separate registers (8.0 s)", "762 runs · 410 handle lots · 762 inspections · 632 shipments"], "sound": "Kick + hats enter (build); data tick on 4.0", "purpose": "Information existed — but departmentally"}, {"id": "S3", "t0": 10.0, "t1": 14.0, "bars": "6–7", "beats": "6.1 → 7.4", "section": "Problem", "visual": "Bar 6: trace chain Batch No → Production run → Handle lot → QC release → Shipment, each node labelled with the register it lives in. Bar 7: evidence — the Trace Report's own warning that one batch number is printed on packs from different dates", "source": "Typography; ws_trace_report_found.jpg (top strip)", "camera": "Evidence frame on the title + warning strip, z ≈ 1.14", "transition": "Nodes on 8th notes; connectors draw; hard cut on bar 7", "text": ["A single trace crossed every register (11.0 s)", "One batch number, many runs (12.0 s)", "333 batch numbers across 762 production runs in the dataset (12.5 s)"], "sound": "Build continues; data tick on 10.0", "purpose": "Show the friction with evidence, not drama"}, {"id": "S4", "t0": 14.0, "t1": 18.0, "bars": "8–9", "beats": "8.1 → 9.4", "section": "Question", "visual": "Near-black stage; the four register panels as faint ghosts converge to the centre panel rectangle", "source": "The four RAW screenshots at 10–60 % opacity", "camera": "Ghost panels ease from grid positions into the Master Traceability frame rect (match cut)", "transition": "Text masks out at 17.3 s; ghosts land exactly on the next shot's frame at 18.0 s", "text": ["What if every record", "was already joined"], "sound": "Break: kick drops out bar 9, riser into the drop, whoosh peak at 17.95 s", "purpose": "The pivot — sets up the solution"}, {"id": "S5", "t0": 18.0, "t1": 24.0, "bars": "10–12", "beats": "10.1 → 12.4", "section": "Solution reveal", "visual": "Bar 10: Master Traceability, then push in to Production Run ID column. Bar 11: the traceability + validation status columns (Fully Traceable / Valid). Bar 12: the workbook's documented data flow as typography — GRN → MRS → RAW Handle → RAW Production → RAW QC → RAW Dispatch → Master Traceability → Trace Report · Reverse Trace · Complaint Tool · Dashboards", "source": "ws_master_traceability.jpg, ws_master_traceability_status.jpg, ARCHITECTURE sheet wording", "camera": "z 0.377 (fit width) → 0.765 on the key column; cut to status view z 0.73", "transition": "Drop on 18.0 (match cut from ghosts); hard cut on 20.0 and 22.0", "text": ["MASTER TRACEABILITY", "One row per production run (18.25 s)", "Joined from every module by Run ID (20.0 s)", "632 of 762 runs fully traceable, handle lot to dispatch (21.0 s)", "ARCHITECTURE · AS DOCUMENTED IN THE WORKBOOK (22.0 s)"], "sound": "Drop: full groove + sub hit on 18.0", "purpose": "Fragmented → connected, shown with the real consolidation layer"}, {"id": "S6", "t0": 24.0, "t1": 30.0, "bars": "13–15", "beats": "13.1 → 15.4", "section": "What the MES connects", "visual": "Six verified modules, one every two beats: Batch trace, Reverse trace, OEE, Validation, Complaints, Dashboards — real sheet close-ups on the right, name + one-line function on the left", "source": "ws_trace_report_found, ws_reverse_trace, ws_oee_dashboard, ws_master_traceability_status, ws_complaint_tool, ws_dashboard_allbrands", "camera": "Each close-up drifts +8 % zoom over its 1 s", "transition": "Hard cuts on beats 1 and 3 of each bar; masked title reveal", "text": ["01 Batch trace — Batch number to components, QC and shipment", "02 Reverse trace — Handle lot to every run it reached", "03 OEE — Availability × performance × quality per run", "04 Validation — Missing QC, invalid handle lot, quantity mismatch, duplicate run ID", "05 Complaints — Market complaint to the run that made it", "06 Dashboards — Plant KPIs filtered by brand, shift and date"], "sound": "Soft click on each cut", "purpose": "Only features verified in the workbook"}, {"id": "S7", "t0": 30.0, "t1": 36.0, "bars": "16–18", "beats": "16.1 → 18.4", "section": "Live working", "visual": "Trace Report, empty search (real recalculated state) → cursor clicks BATCH NO. → JHS-26003 typed on 16th notes → Enter → real recalculated state: 1 matching record, run PR-2026-00003 → camera glides to the dossier: handle lot HL-AMW-26-0061, dispatch DN-26-00002, Delivered → match cut on the handle lot into Reverse Trace → 3 runs, 8,312 good units exposed", "source": "ws_trace_report_empty.jpg, ws_trace_report_found.jpg, ws_reverse_trace.jpg", "camera": "z 1.02 on search strip → z 0.833 on dossier (33.0–33.9 s) → reverse trace placed so its HL-AMW-26-0061 lands on the same screen point (measured anchors), then eases to z 0.78", "transition": "State swap on the Enter beat (32.5 s); match cut at 34.5 s", "text": ["Enter a batch number", "The matching production run is found", "Components, QC and shipment in one record", "Reverse trace from the handle lot", "3 runs · 8,312 good units exposed"], "sound": "Cursor click 31.0, keystrokes 31.0–32.0 on 16ths, Enter + confirm 32.5, whoosh peak 34.5, data tick 35.5", "purpose": "The most convincing section: real inputs, real recalculated outputs"}, {"id": "S8", "t0": 36.0, "t1": 40.0, "bars": "19–20", "beats": "19.1 → 20.4", "section": "Stakeholders", "visual": "2×2 echo of the old-process grid, now labelled by who uses each part (from the workbook's Daily Operating Routine): Production, Quality, Dispatch, Management. Bar 20: the Management panel expands; the brand filter is switched from All Brands to Chicco and the KPIs recalculate (real second state)", "source": "ws_raw_production, ws_raw_qc, ws_raw_dispatch, ws_dashboard_allbrands → ws_dashboard_chicco", "camera": "Grid z 0.40; expanded dashboard z 0.753", "transition": "Panels on beats; expansion 38.0–38.5; state swap on 39.0", "text": ["Each department keeps its register", "PRODUCTION Records each run", "QUALITY Sets QC and release status", "DISPATCH Ships released batches", "MANAGEMENT Reads KPIs and alerts", "One filter recalculates every KPI"], "sound": "Click 38.75, confirm 39.0", "purpose": "Who benefits — only roles the workbook names"}, {"id": "S9", "t0": 40.0, "t1": 42.0, "bars": "21", "beats": "21.1 → 21.4", "section": "Impact", "visual": "Three evidence-based outcome lines on dark, faint dashboard behind", "source": "Typography", "camera": "Static", "transition": "Masked reveals on beats 1, 2, 3", "text": ["WHAT THE SYSTEM ENABLES", "Batch to shipment in one record", "Component lot to every affected run", "OEE calculated from the run records"], "sound": "Groove thins out", "purpose": "Qualitative value — no invented ROI"}, {"id": "S10", "t0": 42.0, "t1": 44.0, "bars": "22", "beats": "22.1 → 22.4", "section": "Vision", "visual": "Operational data → Connected records → Decision support, with the module that does each step", "source": "Typography", "camera": "Static", "transition": "Nodes on beats 1, 2, 3; connector draws", "text": ["Operational data / RAW registers", "Connected records / Master Traceability", "Decision support / Dashboards and alerts"], "sound": "—", "purpose": "Operations + Data + Technology bridge"}, {"id": "S11", "t0": 44.0, "t1": 46.0, "bars": "23", "beats": "23.1 → 23.4", "section": "Closing", "visual": "Executive Dashboard hero, slow push-in", "source": "ws_dashboard_allbrands.jpg", "camera": "z 0.597 → 0.75", "transition": "Cut on 44.0", "text": ["From records to visibility"], "sound": "Resolve chord", "purpose": "Land the message on the real interface"}, {"id": "S12", "t0": 46.0, "t1": 48.0, "bars": "24", "beats": "24.1 → 24.4", "section": "End card", "visual": "Title card, fade to black", "source": "Typography", "camera": "Static", "transition": "Fade to black 47.3–48.0", "text": ["Manufacturing Execution System", "JHS Svendgaard Laboratories Limited", "Operations Internship Project  ·  Shreejita Srivastava", "Built in Microsoft Excel  ·  Demonstration dataset"], "sound": "Final low hit on 46.0, fade", "purpose": "Attribution"}], "sfx": [{"t": 4.0, "file": "data_tick.wav", "gain_db": -20, "align": "peak"}, {"t": 10.0, "file": "data_tick.wav", "gain_db": -20, "align": "peak"}, {"t": 17.95, "file": "swoosh.wav", "gain_db": -18, "align": "peak"}, {"t": 22.0, "file": "data_tick.wav", "gain_db": -22, "align": "peak"}, {"t": 24.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 25.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 26.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 27.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 28.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 29.0, "file": "click.wav", "gain_db": -24, "align": "peak"}, {"t": 31.0, "file": "click.wav", "gain_db": -14, "align": "peak"}, {"t": 31.125, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.25, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.375, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.5, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.625, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.75, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 31.875, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 32.0, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 32.125, "file": "key.wav", "gain_db": -18, "align": "peak"}, {"t": 32.5, "file": "key.wav", "gain_db": -16, "align": "peak"}, {"t": 32.5, "file": "confirm.wav", "gain_db": -17, "align": "peak"}, {"t": 34.5, "file": "swoosh.wav", "gain_db": -20, "align": "peak"}, {"t": 35.5, "file": "data_tick.wav", "gain_db": -18, "align": "peak"}, {"t": 38.75, "file": "click.wav", "gain_db": -14, "align": "peak"}, {"t": 39.0, "file": "confirm.wav", "gain_db": -18, "align": "peak"}]};
+const ASSETS = {"screens": {"ws_home": {"src": "assets/screenshots/ws_home.jpg", "w": 3010, "h": 2330, "a": {"SYSTEM STATUS": [[36, 231, 223, 265]], "Runs fully traceable": [[15, 357, 237, 391]], "WORKFLOW": [[36, 2236, 179, 2269]], "NAVIGATION": [[36, 641, 188, 674], [1048, 730, 1166, 764]]}}, "ws_dashboard_allbrands": {"src": "assets/screenshots/ws_dashboard_allbrands.jpg", "w": 2337, "h": 2671, "a": {"BRAND / COMPANY": [[25, 145, 165, 165]], "All Brands": [[17, 180, 109, 207]], "OUTPUT & EFFICIENCY": [[26, 279, 212, 303]], "OVERALL OEE": [[1282, 313, 1377, 334]], "TRENDS & DISTRIBUTION": [[26, 629, 235, 654]], "NEEDS ATTENTION": [[26, 2120, 182, 2144]]}}, "ws_dashboard_chicco": {"src": "assets/screenshots/ws_dashboard_chicco.jpg", "w": 2337, "h": 2671, "a": {"BRAND / COMPANY": [[25, 145, 165, 165]], "Chicco": [[244, 90, 288, 111], [17, 180, 76, 207], [359, 1548, 406, 1571]], "OUTPUT & EFFICIENCY": [[26, 279, 212, 303]]}}, "ws_oee_dashboard": {"src": "assets/screenshots/ws_oee_dashboard.jpg", "w": 2849, "h": 2671, "a": {"OEE HEADLINE": [[36, 387, 205, 421]], "OEE ANALYSIS": [[36, 874, 200, 908]], "MACHINE OEE DETAIL": [[36, 2311, 288, 2345]]}}, "ws_architecture": {"src": "assets/screenshots/ws_architecture.jpg", "w": 2524, "h": 1591, "a": {"2. WORKFLOW": [[92, 543, 263, 577]], "3. MODULE MAP": [[92, 1032, 286, 1066]]}}, "ws_master_traceability": {"src": "assets/screenshots/ws_master_traceability.jpg", "w": 4670, "h": 1279, "a": {"Production Run ID": [[956, 87, 1151, 119], [662, 166, 847, 196], [3, 233, 192, 263]], "MASTER TRACEABILITY": [[886, 13, 1337, 70]]}}, "ws_master_traceability_status": {"src": "assets/screenshots/ws_master_traceability_status.jpg", "w": 3406, "h": 1074, "a": {"Overall Traceability Status": [[2801, 28, 3074, 58]], "Data Validation Status": [[3089, 28, 3321, 58]]}}, "ws_raw_production": {"src": "assets/screenshots/ws_raw_production.jpg", "w": 4712, "h": 1253, "a": {"Handle Lot Number": [[1256, 228, 1454, 258]]}}, "ws_raw_handle": {"src": "assets/screenshots/ws_raw_handle.jpg", "w": 4377, "h": 1279, "a": {"Handle Lot No.": [[1184, 233, 1338, 263]]}}, "ws_raw_qc": {"src": "assets/screenshots/ws_raw_qc.jpg", "w": 4037, "h": 1279, "a": {"Release Status": [[249, 87, 404, 119]]}}, "ws_raw_dispatch": {"src": "assets/screenshots/ws_raw_dispatch.jpg", "w": 4679, "h": 1241, "a": {"Dispatch Number": [[2175, 226, 2349, 255]]}}, "ws_complaint_tool": {"src": "assets/screenshots/ws_complaint_tool.jpg", "w": 4725, "h": 1181, "a": {"COMPLAINT INVESTIGATION": [[36, 449, 366, 483]], "Manufacturing record behind": [[36, 899, 375, 932]]}}, "ws_reverse_trace": {"src": "assets/screenshots/ws_reverse_trace.jpg", "w": 3990, "h": 1449, "a": {"DIRECTION 2": [[36, 774, 183, 808]], "HL-AMW-26-0061": [[3, 411, 206, 445], [24, 858, 249, 896]], "PRODUCTION RUNS AFFECTED": [[1246, 823, 1544, 852]], "8,312": [[2109, 858, 2178, 896]], "DIRECTION 1": [[36, 206, 183, 240]], "PR-2026-00003": [[24, 290, 215, 328], [3, 1016, 176, 1050]], "Perlon Nylon GmbH": [[1215, 569, 1438, 603]]}}, "ws_trace_report_found": {"src": "assets/screenshots/ws_trace_report_found.jpg", "w": 3640, "h": 2656, "a": {"BATCH NO.": [[671, 76, 764, 105], [121, 146, 208, 173], [30, 234, 127, 259]], "JHS-26003": [[21, 265, 136, 298], [310, 451, 413, 481], [310, 1555, 413, 1585]], "MATCHING RECORDS": [[3072, 234, 3257, 259]], "STEP 2": [[32, 342, 98, 372]], "PR-2026-00003": [[581, 1297, 750, 1330], [1765, 1694, 1918, 1724]], "MATERIAL TRACEABILITY": [[1514, 1770, 1768, 1800]], "HL-AMW-26-0061": [[1765, 1811, 1944, 1841]], "Released": [[310, 2090, 399, 2120]], "DN-26-00002": [[3045, 1985, 3177, 2015]], "The same Batch No. is printed": [[31, 146, 297, 173]], "PRODUCT INFORMATION": [[32, 1375, 289, 1405]], "MACHINE & DISPATCH": [[2712, 1770, 2941, 1800]], "Delivered": [[3045, 2159, 3140, 2189]]}}, "ws_trace_report_empty": {"src": "assets/screenshots/ws_trace_report_empty.jpg", "w": 3640, "h": 2656, "a": {"BATCH NO.": [[671, 76, 764, 105], [121, 146, 208, 173], [30, 234, 127, 259]], "MATCHING RECORDS": [[3072, 234, 3257, 259]]}}}, "audio": "output/mes_mix.m4a"};
+</script>
+<script>
+"use strict";
+/* ============================== constants ============================== */
+const W = 1920, H = 1080, DUR = STORY.meta.duration_s, BEAT = 0.5, BAR = 2.0;
+const SC = ASSETS.screens;                       // {id:{src,w,h,a:{label:[[x0,y0,x1,y1],...]}}}
+const A = (id, label, i = 0) => SC[id].a[label][i];
+
+/* ============================== math ============================== */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const io = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;   // ease in-out cubic
+const out = x => 1 - Math.pow(1 - x, 3);                                   // ease out cubic
+const inn = x => x * x * x;
+/* in/out envelope: 0 before a, ramps to 1 by a+d, holds, ramps down from b-d2 to b */
+const env = (t, a, d, b, d2) => Math.min(out(P(t, a, a + d)), b === undefined ? 1 : 1 - inn(P(t, b - d2, b)));
+
+/* ============================== DOM helpers ============================== */
+const VP = document.getElementById('viewport');
+function el(tag, cls, parent, html) {
+  const e = document.createElement(tag); if (cls) e.className = cls;
+  if (html !== undefined) e.innerHTML = html; (parent || VP).appendChild(e); return e;
+}
+function place(e, x, y, w, h) {
+  e.style.position = 'absolute'; e.style.left = x + 'px'; e.style.top = y + 'px';
+  if (w !== undefined) e.style.width = w + 'px'; if (h !== undefined) e.style.height = h + 'px';
+}
+/* masked type: text rises into a clipping box; v=1 fully in; leaving uses v2 (0→1 = moving up and out) */
+function Mask(parent, cls, text, x, y, align) {
+  const m = el('div', 'mask ' + cls, parent); const i = el('div', 'in', m, text);
+  m.style.top = y + 'px';
+  if (align === 'center') { m.style.left = '0'; m.style.width = W + 'px'; m.style.textAlign = 'center'; }
+  else m.style.left = x + 'px';
+  m.style.paddingBottom = '.12em';
+  return { m, i, set(vIn, vOut = 0) {
+    const shown = vIn > 0 && vOut < 1; m.style.visibility = shown ? 'visible' : 'hidden';
+    i.style.transform = `translateY(${(1 - vIn) * 110 - vOut * 110}%)`;
+  } };
+}
+/* A window onto a real screenshot with a camera {cx, cy, z} in image pixels */
+function Frame(parent, id, rect) {
+  const f = el('div', 'frame', parent); const img = el('img', '', f); img.decoding = 'sync';
+  const o = { f, img, id: null, rect, cam: { cx: 0, cy: 0, z: 1 } };
+  o.setImage = nid => { if (o.id !== nid) { o.id = nid; img.src = SC[nid].src; img.style.width = SC[nid].w + 'px'; img.style.height = SC[nid].h + 'px'; } };
+  o.setRect = r => { o.rect = r; place(f, r.x, r.y, r.w, r.h); };
+  o.setCam = c => { o.cam = c; img.style.transform = `translate(${o.rect.w / 2 - c.cx * c.z}px,${o.rect.h / 2 - c.cy * c.z}px) scale(${c.z})`; };
+  /* image px → stage px */
+  o.toStage = (x, y) => ({ x: o.rect.x + o.rect.w / 2 + (x - o.cam.cx) * o.cam.z, y: o.rect.y + o.rect.h / 2 + (y - o.cam.cy) * o.cam.z });
+  o.setImage(id); o.setRect(rect); return o;
+}
+/* camera that fits an image rectangle [x0,y0,x1,y1] inside a frame (contain) */
+function fit(r, frameRect, pad = 1) {
+  const z = Math.min(frameRect.w / (r[2] - r[0]), frameRect.h / (r[3] - r[1])) * pad;
+  return { cx: (r[0] + r[2]) / 2, cy: (r[1] + r[3]) / 2, z };
+}
+/* interpolate cameras: centre linearly, zoom geometrically (perceptually even) */
+function camLerp(a, b, x) { return { cx: lerp(a.cx, b.cx, x), cy: lerp(a.cy, b.cy, x), z: Math.exp(lerp(Math.log(a.z), Math.log(b.z), x)) }; }
+/* highlight box on an image rectangle, expressed through a frame's current camera */
+function HL(parent) { const h = el('div', 'hl', parent); return {
+  h, set(frame, r, v, pad = 8) {
+    h.style.opacity = v; if (v <= 0) return;
+    const a = frame.toStage(r[0], r[1]), b = frame.toStage(r[2], r[3]), F = frame.rect;
+    const x0 = Math.max(a.x - pad, F.x + 2), y0 = Math.max(a.y - pad, F.y + 2), x1 = Math.min(b.x + pad, F.x + F.w - 2), y1 = Math.min(b.y + pad, F.y + F.h - 2);
+    if (x1 <= x0 || y1 <= y0) { h.style.opacity = 0; return; }
+    place(h, x0, y0, x1 - x0, y1 - y0);
+  } }; }
+function Cursor(parent) {
+  const c = el('div', 'cursor', parent,
+    '<svg viewBox="0 0 24 24" width="30" height="30"><path d="M3 2 L3 19 L7.5 14.8 L10.6 21.6 L13.4 20.4 L10.4 13.7 L16.5 13.4 Z" fill="#fff" stroke="#0F172A" stroke-width="1.4" stroke-linejoin="round"/></svg>');
+  return { c, set(x, y, v, press = 0) { c.style.opacity = v; c.style.transform = `translate(${x - 4}px,${y - 2}px) scale(${1 - .12 * press})`; } };
+}
+
+/* ============================== layout constants ============================== */
+const GRID = [ {x:160,y:255,w:760,h:330}, {x:1000,y:255,w:760,h:330}, {x:160,y:655,w:760,h:330}, {x:1000,y:655,w:760,h:330} ];
+const MAIN = { x: 80, y: 210, w: 1760, h: 780 };
+const REG = ['ws_raw_production', 'ws_raw_handle', 'ws_raw_qc', 'ws_raw_dispatch'];
+const REG_CAM = t => ({ cx: 950 + (t - 4) * 22, cy: 420, z: 0.40 });
+
+/* ============================== scenes ============================== */
+const scenes = [];
+function Scene(t0, t1, build, update, tag) {
+  const root = el('div', 'scene'); const s = { t0, t1, root, tag: tag || (() => 0) };
+  Object.assign(s, build(root) || {}); s.update = t => update.call(s, t); scenes.push(s); return s;
+}
+
+/* ---- S1 HOOK 0–4 ---- */
+Scene(0, 4, r => {
+  const fr = Frame(r, 'ws_raw_production', { x: 0, y: 0, w: W, h: H }); fr.f.style.borderRadius = '0';
+  const scrim = el('div', 'abs', r); place(scrim, 0, 0, W, H);
+  scrim.style.background = 'linear-gradient(90deg,rgba(8,17,31,.94) 0%,rgba(8,17,31,.82) 48%,rgba(8,17,31,.62) 100%)';
+  return { fr, lab: Mask(r, 'lab', 'Kala Amb Unit-I &nbsp;·&nbsp; Toothbrush manufacturing', 140, 410),
+    h: Mask(r, 'h1', 'Every batch leaves a trail', 140, 452),
+    sub: Mask(r, 'sub', 'Across moulding, production, quality and dispatch', 140, 575) };
+}, function (t) {
+  this.fr.setCam({ cx: lerp(1050, 2300, io(P(t, 0, 4))), cy: 600, z: .92 });
+  const o = P(t, 3.45, 3.9);
+  this.lab.set(out(P(t, .5, 1.0)), inn(o)); this.h.set(out(P(t, 1.0, 1.55)), inn(o)); this.sub.set(out(P(t, 2.0, 2.45)), inn(o));
+}, t => t < 3.6 ? 1 : 0);
+
+/* ---- S2 OLD PROCESS 4–10 ---- */
+const REG_LAB = [['Production', '762 runs'], ['Handle &amp; cap', '410 handle lots'], ['Quality', '762 inspections'], ['Dispatch', '632 shipments']];
+Scene(4, 10, r => {
+  const panels = GRID.map((g, i) => {
+    const wrap = el('div', 'abs', r);            // fade/translate the wrapper, never the frame's image
+    const fr = Frame(wrap, REG[i], g);
+    const l = el('div', 'lab', wrap, `${REG_LAB[i][0]} &nbsp;<span class="acc" style="letter-spacing:.04em;text-transform:none">${REG_LAB[i][1]}</span>`);
+    place(l, g.x, g.y - 36); return { wrap, fr };
+  });
+  return { panels, a: Mask(r, 'h2', 'The information existed', 160, 98), b: Mask(r, 'h2', 'Kept in separate registers', 160, 98) };
+}, function (t) {
+  this.panels.forEach((p, i) => {
+    const v = out(P(t, 4 + i * .5, 4.45 + i * .5));
+    p.wrap.style.opacity = v * (1 - .5 * P(t, 9.5, 10)); p.wrap.style.transform = `translateY(${(1 - v) * 24}px)`;
+    p.fr.setCam(REG_CAM(t));
+  });
+  this.a.set(out(P(t, 6.0, 6.5)), inn(P(t, 7.55, 7.95))); this.b.set(out(P(t, 8.0, 8.5)), inn(P(t, 9.55, 9.95)));
+}, t => t >= 4.3 ? 1 : 0);
+
+/* ---- S3 PROBLEM 10–14 ---- */
+const CHAIN = [['Batch No', 'on the pack'], ['Production run', 'RAW Production'], ['Handle lot', 'RAW Handle'], ['QC release', 'RAW QC'], ['Shipment', 'RAW Dispatch']];
+const CX = [260, 610, 960, 1310, 1660], CY = 400;
+Scene(10, 14, r => {
+  const chain = el('div', 'abs', r); place(chain, 0, 0, W, H);
+  const bars = CX.slice(0, 4).map((x, i) => { const b = el('div', 'bar', chain); place(b, x + 105, CY + 22, CX[i + 1] - x - 210); return b; });
+  const nodes = CHAIN.map((c, i) => { const n = el('div', 'node', chain, `<div class="n">${c[0]}</div><div class="s">${c[1]}</div>`); place(n, CX[i], CY); return n; });
+  const cap = Mask(chain, 'h3', 'A single trace crossed every register', 0, 560, 'center');
+  const ev = el('div', 'abs', r);
+  const fr = Frame(ev, 'ws_trace_report_found', { x: 160, y: 420, w: 1600, h: 400 });
+  const hl = HL(ev); const src = el('div', 'lab', ev, 'Source &nbsp;·&nbsp; Trace Report sheet'); place(src, 160, 850);
+  return { chain, bars, nodes, cap, ev, fr, hl, h: Mask(r, 'h2', 'One batch number, many runs', 160, 150),
+    st: Mask(r, 'sub', '333 batch numbers across 762 production runs in the dataset', 160, 262) };
+}, function (t) {
+  const tn = i => 10 + i * .25;
+  this.nodes.forEach((n, i) => { const v = out(P(t, tn(i), tn(i) + .3)); n.style.opacity = v; n.style.transform = `translate(-50%,${(1 - v) * 18}px)`; });
+  this.bars.forEach((b, i) => { b.style.transform = `scaleX(${io(P(t, tn(i) + .1, tn(i + 1) + .1))})`; });
+  this.cap.set(out(P(t, 11.0, 11.4)));
+  this.chain.style.opacity = 1 - P(t, 11.7, 11.95);
+  this.h.set(out(P(t, 12.0, 12.45)), inn(P(t, 13.6, 13.95))); this.st.set(out(P(t, 12.4, 12.85)), inn(P(t, 13.6, 13.95)));
+  const v = out(P(t, 12.75, 13.2)); this.ev.style.opacity = v * (1 - P(t, 13.65, 13.95)); this.ev.style.transform = `translateY(${(1 - v) * 24}px)`;
+  this.fr.setCam(camLerp(fit([0, 0, 1420, 350], this.fr.rect), fit([0, 110, 1420, 210], this.fr.rect, .98), io(P(t, 13.0, 13.9))));
+  this.hl.set(this.fr, [14, 136, 1365, 184], out(P(t, 13.15, 13.4)), 4);
+}, t => t >= 12.8 ? 1 : 0);
+
+/* ---- S4 QUESTION 14–18 (ghost registers converge → match cut into S5 frame) ---- */
+Scene(14, 18, r => {
+  const ghosts = GRID.map((g, i) => { const w = el('div', 'abs', r); const fr = Frame(w, REG[i], g); return { w, fr }; });
+  const mw = el('div', 'abs', r); const master = Frame(mw, 'ws_master_traceability', MAIN);
+  master.setCam(fit([0, 0, SC.ws_master_traceability.w, SC.ws_master_traceability.h], MAIN));
+  return { ghosts, mw, a: Mask(r, 'h1', 'What if every record', 0, 400, 'center'), b: Mask(r, 'h1', 'was already joined', 0, 505, 'center') };
+}, function (t) {
+  const k = io(P(t, 15.4, 18.0));
+  this.ghosts.forEach((g, i) => {
+    const G = GRID[i]; const rect = { x: lerp(G.x, MAIN.x, k), y: lerp(G.y, MAIN.y, k), w: lerp(G.w, MAIN.w, k), h: lerp(G.h, MAIN.h, k) };
+    g.fr.setRect(rect); g.fr.setCam(camLerp(REG_CAM(10), fit([0, 0, SC.ws_master_traceability.w, SC.ws_master_traceability.h], MAIN), k));
+    g.w.style.opacity = lerp(.10, .28, inn(P(t, 16.5, 17.6))) * (1 - P(t, 17.6, 18));
+  });
+  this.mw.style.opacity = io(P(t, 17.55, 18));
+  const o = P(t, 17.15, 17.5);
+  this.a.set(out(P(t, 14.5, 15.0)), inn(o)); this.b.set(out(P(t, 15.0, 15.5)), inn(o));
+});
+
+/* ---- S5 SOLUTION 18–24 ---- */
+const ARCH = ['GRN', 'MRS', 'RAW Handle', 'RAW Production', 'RAW QC', 'RAW Dispatch'];
+const AX = [230, 520, 810, 1110, 1400, 1690], AY = 330, MY = 610;
+Scene(18, 24, r => {
+  const sheet = el('div', 'abs', r);
+  const fr = Frame(sheet, 'ws_master_traceability', MAIN); const hl = HL(sheet);
+  const lab = Mask(sheet, 'lab acc', 'Master Traceability', 80, 96);
+  const a = Mask(sheet, 'h3', 'One row per production run', 80, 128), b = Mask(sheet, 'h3', 'Joined from every module by Run ID', 80, 128);
+  const chip = el('div', 'chip', sheet, '<b>632 of 762</b> runs fully traceable, handle lot to dispatch'); place(chip, 80, 1006);
+  chip.style.padding = '8px 14px'; chip.style.fontSize = '20px';
+  const arch = el('div', 'abs', r); place(arch, 0, 0, W, H);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.style.position = 'absolute'; arch.appendChild(svg);
+  const lines = AX.map(x => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', `M${x} ${AY + 80} C ${x} ${AY + 170}, 960 ${MY - 110}, 960 ${MY - 16}`);
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#4D7CF5'); p.setAttribute('stroke-width', '2'); svg.appendChild(p); return p; });
+  const nodes = ARCH.map((n, i) => { const e = el('div', 'node', arch, `<div class="n" style="font-size:26px">${n}</div>`); place(e, AX[i], AY); return e; });
+  const master = el('div', 'node', arch, '<div class="n" style="font-size:40px">Master Traceability</div><div class="s">one row per production run</div>'); place(master, 960, MY);
+  const outs = Mask(arch, 'sub', 'Trace Report &nbsp;·&nbsp; Reverse Trace &nbsp;·&nbsp; Complaint Tool &nbsp;·&nbsp; Dashboards', 0, 800, 'center');
+  const alab = Mask(arch, 'lab', 'Architecture &nbsp;·&nbsp; as documented in the workbook', 0, 180, 'center');
+  return { sheet, fr, hl, lab, a, b, chip, arch, lines, nodes, master, outs, alab };
+}, function (t) {
+  const fr = this.fr;
+  this.sheet.style.display = t < 22 ? 'block' : 'none'; this.arch.style.display = t >= 22 ? 'block' : 'none';
+  if (t < 20) {
+    fr.setImage('ws_master_traceability');
+    fr.setCam(camLerp(fit([0, 0, 4670, 1279], MAIN), fit([0, 60, 2300, 760], MAIN), io(P(t, 18.25, 19.9))));
+    this.hl.set(fr, [0, 222, 196, 1279], out(P(t, 19.2, 19.5)), 2);
+  } else {
+    fr.setImage('ws_master_traceability_status');
+    fr.setCam(camLerp(fit([1850, 0, 3406, 1074], MAIN), fit([1950, 0, 3406, 1000], MAIN), io(P(t, 20, 22))));
+    this.hl.set(fr, [2790, 12, 3400, 1074], out(P(t, 20.45, 20.8)), 2);
+  }
+  this.lab.set(out(P(t, 18.1, 18.5))); this.a.set(out(P(t, 18.25, 18.7)), t >= 20 ? 1 : 0); this.b.set(t >= 20 ? out(P(t, 20.0, 20.45)) : 0);
+  const cv = out(P(t, 21.0, 21.35)); this.chip.style.opacity = cv; this.chip.style.transform = `translateY(${(1 - cv) * 12}px)`;
+  if (t >= 22) {
+    this.alab.set(out(P(t, 22.0, 22.4)));
+    this.nodes.forEach((n, i) => { const v = out(P(t, 22 + i * .25, 22.3 + i * .25)); n.style.opacity = v; n.style.transform = `translate(-50%,${(1 - v) * 16}px)`; });
+    this.lines.forEach((p, i) => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L * (1 - io(P(t, 22.4 + i * .1, 23.3 + i * .05))); });
+    const mv = out(P(t, 23.25, 23.6)); this.master.style.opacity = mv; this.master.style.transform = `translate(-50%,${(1 - mv) * 16}px)`;
+    this.outs.set(out(P(t, 23.5, 23.85)));
+    this.arch.style.opacity = 1 - P(t, 23.85, 24);
+  }
+}, t => t < 22 ? 1 : 0);
+
+/* ---- S6 FEATURES 24–30 ---- */
+const FEAT = [
+  ['Batch trace', 'Batch number to components, QC and shipment', 'ws_trace_report_found', [1440, 1740, 3660, 2300]],
+  ['Reverse trace', 'Handle lot to every run it reached', 'ws_reverse_trace', [-30, 180, 2350, 1120]],
+  ['OEE', 'Availability × performance × quality per run', 'ws_oee_dashboard', [-20, 360, 1860, 900]],
+  ['Validation', 'Missing QC, invalid handle lot, quantity mismatch, duplicate run ID', 'ws_master_traceability_status', [2545, 0, 3420, 610]],
+  ['Complaints', 'Market complaint to the run that made it', 'ws_complaint_tool', [-20, 0, 2560, 960]],
+  ['Dashboards', 'Plant KPIs filtered by brand, shift and date', 'ws_dashboard_allbrands', [-20, 120, 2360, 650]]];
+const FR6 = { x: 700, y: 150, w: 1120, h: 780 };
+Scene(24, 30, r => {
+  const wrap = el('div', 'abs', r); const fr = Frame(wrap, FEAT[0][2], FR6);
+  const items = FEAT.map((f, i) => {
+    const g = el('div', 'abs', r);
+    const idx = Mask(g, 'lab acc', `0${i + 1} &nbsp;/&nbsp; 06`, 120, 420);
+    const ti = Mask(g, 'h2', f[0], 120, 458);
+    const d = el('div', 'sub', g, f[1]); place(d, 120, 555, 500); d.style.fontSize = '24px'; d.style.lineHeight = '1.4';
+    return { g, idx, ti, d };
+  });
+  return { wrap, fr, items };
+}, function (t) {
+  const i = clamp(Math.floor(t - 24), 0, 5), lt = t - 24 - i; const f = FEAT[i];
+  this.fr.setImage(f[2]); const c = fit(f[3], FR6); this.fr.setCam({ ...c, z: c.z * lerp(1, 1.04, io(clamp(lt))) });
+  const v = out(P(lt, 0, .22)); this.wrap.style.opacity = (i === 0 ? out(P(t, 24, 24.25)) : 1) * (1 - P(t, 29.8, 30));
+  this.wrap.style.transform = `scale(${lerp(1.015, 1, v)})`;
+  this.items.forEach((it, k) => {
+    const on = k === i; it.g.style.display = on ? 'block' : 'none'; if (!on) return;
+    it.idx.set(out(P(lt, 0, .25))); it.ti.set(out(P(lt, .02, .3)), k === 5 ? inn(P(t, 29.75, 30)) : 0);
+    it.d.style.opacity = out(P(lt, .12, .4)) * (k === 5 ? 1 - P(t, 29.75, 30) : 1);
+  });
+}, t => 1);
+
+/* ---- S7 LIVE 30–36 ---- */
+const LIVE = { x: 60, y: 96, w: 1800, h: 870 };
+const CAM_SEARCH = [0, 60, 1760, 640], CAM_DOSSIER = [1480, 1240, 3640, 2250], CAM_REV = [0, 760, 2300, 1140];
+const BATCH = 'JHS-26003';
+Scene(30, 36, r => {
+  const fr = Frame(r, 'ws_trace_report_empty', LIVE);
+  const typed = el('div', 'typed', r); const caret = el('div', 'caret', r);
+  const hls = [HL(r), HL(r), HL(r), HL(r), HL(r)];
+  const where = Mask(r, 'lab acc', 'Live &nbsp;·&nbsp; Trace Report', 60, 42), where2 = Mask(r, 'lab acc', 'Live &nbsp;·&nbsp; Reverse Trace', 60, 42);
+  const caps = ['Enter a batch number', 'The matching production run is found', 'Components, QC and shipment in one record', 'Reverse trace from the handle lot', '<b>3 runs</b> &nbsp;·&nbsp; <b>8,312</b> good units exposed']
+    .map(s => { const c = el('div', 'chip', r, s); place(c, 60, 992); return c; });
+  return { fr, typed, caret, hls, where, where2, caps, cur: Cursor(r) };
+}, function (t) {
+  const fr = this.fr;
+  // ---- camera + state (state swap on the Enter beat, 32.5 s; match cut into Reverse Trace at 34.5 s)
+  const cSearch = fit(CAM_SEARCH, LIVE), cDoss = fit(CAM_DOSSIER, LIVE);
+  if (t < 34.5) {
+    fr.setImage(t < 32.5 ? 'ws_trace_report_empty' : 'ws_trace_report_found');
+    fr.setCam(camLerp(cSearch, cDoss, io(P(t, 33.0, 33.9))));
+  } else {
+    // match cut: place Reverse Trace so its handle-lot cell lands where the Trace Report's did
+    const hA = A('ws_trace_report_found', 'HL-AMW-26-0061'), hB = A('ws_reverse_trace', 'HL-AMW-26-0061', 1);
+    const sA = { cx: (hA[0] + hA[2]) / 2, cy: (hA[1] + hA[3]) / 2 };
+    const pA = { x: LIVE.w / 2 + (sA.cx - cDoss.cx) * cDoss.z, y: LIVE.h / 2 + (sA.cy - cDoss.cy) * cDoss.z };  // frame-local
+    const bc = { x: (hB[0] + hB[2]) / 2, y: (hB[1] + hB[3]) / 2 };
+    const c0 = { z: cDoss.z, cx: bc.x - (pA.x - LIVE.w / 2) / cDoss.z, cy: bc.y - (pA.y - LIVE.h / 2) / cDoss.z };
+    fr.setImage('ws_reverse_trace'); fr.setCam(camLerp(c0, fit(CAM_REV, LIVE), io(P(t, 34.55, 35.25))));
+  }
+  // ---- typing overlay (only before Enter; afterwards the real recalculated cell shows the value)
+  const bRect = A('ws_trace_report_found', BATCH, 0);
+  const n = t < 31.125 ? 0 : clamp(Math.floor((t - 31.125) / .125) + 1, 0, BATCH.length);
+  const p0 = fr.toStage(bRect[0], bRect[1]), p1 = fr.toStage(bRect[2], bRect[3]);
+  const fs = (p1.y - p0.y) * 1.02;
+  this.typed.style.display = t >= 31 && t < 32.5 ? 'block' : 'none';
+  this.typed.textContent = BATCH.slice(0, n); this.typed.style.fontSize = fs + 'px';
+  place(this.typed, p0.x, p0.y - fs * .16);
+  const tw = (p1.x - p0.x) * n / BATCH.length;
+  const blink = (Math.floor((t - 31) / .25) % 2 === 0) || (t > 31.1 && t < 32.2);
+  this.caret.style.display = t >= 31 && t < 32.5 && blink ? 'block' : 'none';
+  place(this.caret, p0.x + tw + 3, p0.y - 2, 3, (p1.y - p0.y) + 4);
+  // ---- cursor
+  const target = { x: p0.x + 150, y: p0.y + (p1.y - p0.y) / 2 };
+  const cx = lerp(1500, target.x, io(P(t, 30.1, 30.85))), cy = lerp(820, target.y + 8, io(P(t, 30.1, 30.85)));
+  const press = Math.max(1 - Math.abs(t - 31.0) / .08, 0);
+  this.cur.set(cx + 60, cy + 10, env(t, 30.05, .2, 32.4, .2), clamp(press));
+  // ---- highlights (all rectangles are measured anchors)
+  const [h0, h1, h2, h3, h4] = this.hls;
+  const found = t >= 32.5 && t < 34.5, rev = t >= 34.5;
+  const row = A('ws_trace_report_found', BATCH, 1);
+  h0.set(fr, [0, row[1] - 12, 1484, row[3] + 12], found ? env(t, 32.5, .15, 33.2, .25) : 0, 2);
+  h1.set(fr, A('ws_trace_report_found', 'PR-2026-00003', 1), found ? env(t, 33.45, .2, 34.5, .05) : 0, 6);
+  h2.set(fr, A('ws_trace_report_found', 'HL-AMW-26-0061'), found ? env(t, 33.7, .2, 34.5, 0.001) : 0, 6);
+  h3.set(fr, found ? A('ws_trace_report_found', 'DN-26-00002') : [0, 1004, 2300, 1142], found ? env(t, 33.95, .2, 34.5, .05) : rev ? env(t, 35.0, .2) : 0, found ? 6 : 2);
+  const ex = A('ws_reverse_trace', '8,312'), lab = A('ws_reverse_trace', 'PRODUCTION RUNS AFFECTED');
+  h4.set(fr, rev && t >= 35.3 ? [lab[0] - 10, lab[1] - 10, ex[2] + 10, ex[3] + 6] : A('ws_reverse_trace', 'HL-AMW-26-0061', 1), rev ? (t < 35.3 ? 1 - P(t, 35.1, 35.3) : out(P(t, 35.3, 35.5))) : 0, 6);
+  // ---- labels + captions
+  this.where.set(out(P(t, 30, 30.3)), t >= 34.5 ? 1 : 0); this.where2.set(t >= 34.5 ? out(P(t, 34.5, 34.8)) : 0);
+  const capT = [[30.25, 32.5], [32.5, 33.4], [33.4, 34.5], [34.5, 35.3], [35.3, 36]];
+  this.caps.forEach((c, i) => { const v = t >= capT[i][0] && t < capT[i][1] ? out(P(t, capT[i][0], capT[i][0] + .2)) : 0; c.style.opacity = v; c.style.transform = `translateY(${(1 - v) * 10}px)`; });
+}, t => 1);
+
+/* ---- S8 STAKEHOLDERS 36–40 ---- */
+const ROLES = [['Production', 'Records each run', 'ws_raw_production'], ['Quality', 'Sets QC and release status', 'ws_raw_qc'],
+               ['Dispatch', 'Ships released batches', 'ws_raw_dispatch'], ['Management', 'Reads KPIs and alerts', 'ws_dashboard_allbrands']];
+const BIG = { x: 80, y: 180, w: 1760, h: 800 }, CAM_DASH = [0, 60, 2337, 640];
+Scene(36, 40, r => {
+  const panels = ROLES.map((ro, i) => {
+    const w = el('div', 'abs', r); const fr = Frame(w, ro[2], GRID[i]);
+    const l = el('div', 'lab', w, `${ro[0]} &nbsp;<span style="color:#F8FAFC;letter-spacing:0;text-transform:none;font-size:20px">${ro[1]}</span>`); place(l, GRID[i].x, GRID[i].y - 36);
+    return { w, fr, l };
+  });
+  const hl = HL(r);
+  return { panels, hl, cur: Cursor(r), a: Mask(r, 'h2', 'Each department keeps its register', 160, 98), b: Mask(r, 'h2', 'One filter recalculates every KPI', 80, 70) };
+}, function (t) {
+  const k = io(P(t, 38.0, 38.5));
+  this.panels.forEach((p, i) => {
+    const v = out(P(t, 36 + i * .5, 36.45 + i * .5));
+    if (i < 3) { p.w.style.opacity = v * (1 - P(t, 37.9, 38.2)); p.w.style.transform = `translateY(${(1 - v) * 24}px)`; p.fr.setCam(REG_CAM(t - 32)); return; }
+    const G = GRID[3]; const rect = { x: lerp(G.x, BIG.x, k), y: lerp(G.y, BIG.y, k), w: lerp(G.w, BIG.w, k), h: lerp(G.h, BIG.h, k) };
+    p.fr.setRect(rect); p.fr.setImage(t < 39.0 ? 'ws_dashboard_allbrands' : 'ws_dashboard_chicco');
+    p.fr.setCam(fit(CAM_DASH, rect)); p.w.style.opacity = v; p.w.style.transform = `translateY(${(1 - v) * 24}px)`;
+    p.l.style.opacity = 1 - P(t, 37.9, 38.1);
+    // cursor → the real BRAND / COMPANY cell; click on 38.75; real "Chicco" state from 39.0
+    const b = A('ws_dashboard_allbrands', 'All Brands'); const s0 = p.fr.toStage(b[0], b[1]), s1 = p.fr.toStage(b[2], b[3]);
+    const tx = s1.x + 40, ty = (s0.y + s1.y) / 2;
+    this.cur.set(lerp(1500, tx, io(P(t, 38.25, 38.7))), lerp(900, ty, io(P(t, 38.25, 38.7))), env(t, 38.2, .15, 39.6, .3), clamp(1 - Math.abs(t - 38.75) / .08));
+    this.hl.set(p.fr, t < 39.0 ? [0, b[1] - 40, 620, b[3] + 10] : [0, 300, 2337, 470], t < 39.0 ? env(t, 38.75, .1, 39.0, .05) : out(P(t, 39.1, 39.35)) * (1 - P(t, 39.8, 40)), 4);
+  });
+  this.a.set(out(P(t, 36.0, 36.45)), inn(P(t, 37.75, 38.0))); this.b.set(out(P(t, 38.3, 38.75)), inn(P(t, 39.75, 40)));
+}, t => 1);
+
+/* ---- S9 IMPACT 40–42 ---- */
+Scene(40, 42, r => {
+  const bg = Frame(r, 'ws_dashboard_allbrands', { x: 0, y: 0, w: W, h: H }); bg.f.style.borderRadius = 0; bg.f.style.opacity = .06;
+  const L = ['Batch to shipment in one record', 'Component lot to every affected run', 'OEE calculated from the run records'];
+  return { bg, lab: Mask(r, 'lab acc', 'What the system enables', 160, 330),
+    lines: L.map((s, i) => Mask(r, 'h2', s, 160, 380 + i * 100)) };
+}, function (t) {
+  this.bg.setCam({ cx: 1168, cy: 900, z: 1.1 });
+  const o = inn(P(t, 41.7, 42)); this.lab.set(out(P(t, 40, 40.35)), o);
+  this.lines.forEach((m, i) => m.set(out(P(t, 40 + i * .5, 40.4 + i * .5)), o));
+});
+
+/* ---- S10 VISION 42–44 ---- */
+const VX = [360, 960, 1560], VY = 470;
+Scene(42, 44, r => {
+  const bars = [0, 1].map(i => { const b = el('div', 'bar', r); place(b, VX[i] + 200, VY + 26, VX[i + 1] - VX[i] - 400); return b; });
+  const V = [['Operational data', 'RAW registers'], ['Connected records', 'Master Traceability'], ['Decision support', 'Dashboards and alerts']];
+  const nodes = V.map((v, i) => { const n = el('div', 'node', r, `<div class="n" style="font-size:42px">${v[0]}</div><div class="s">${v[1]}</div>`); place(n, VX[i], VY); return n; });
+  return { bars, nodes };
+}, function (t) {
+  this.nodes.forEach((n, i) => { const v = out(P(t, 42 + i * .5, 42.35 + i * .5)); n.style.opacity = v * (1 - P(t, 43.8, 44)); n.style.transform = `translate(-50%,${(1 - v) * 16}px)`; });
+  this.bars.forEach((b, i) => { b.style.transform = `scaleX(${io(P(t, 42.2 + i * .5, 42.55 + i * .5))})`; b.style.opacity = 1 - P(t, 43.8, 44); });
+});
+
+/* ---- S11 CLOSING 44–46 ---- */
+const CL = { x: 80, y: 200, w: 1760, h: 800 };
+Scene(44, 46, r => ({ fr: Frame(r, 'ws_dashboard_allbrands', CL), h: Mask(r, 'h2', 'From records to visibility', 80, 72) }),
+function (t) {
+  this.fr.setCam(camLerp(fit([0, 0, 2337, 1340], CL), fit([0, 60, 2337, 1000], CL), io(P(t, 44, 46))));
+  this.fr.f.style.opacity = out(P(t, 44, 44.3)) * (1 - P(t, 45.75, 46));
+  this.h.set(out(P(t, 44.25, 44.7)), inn(P(t, 45.7, 46)));
+}, t => t < 45.8 ? 1 : 0);
+
+/* ---- S12 END 46–48 ---- */
+Scene(46, 48, r => ({
+  a: Mask(r, 'h2', 'Manufacturing Execution System', 0, 405, 'center'),
+  b: Mask(r, 'sub', 'JHS Svendgaard Laboratories Limited', 0, 505, 'center'),
+  c: Mask(r, 'sub', 'Operations Internship Project &nbsp;·&nbsp; Shreejita Srivastava', 0, 552, 'center'),
+  d: Mask(r, 'lab', 'Built in Microsoft Excel &nbsp;·&nbsp; Demonstration dataset', 0, 660, 'center') }),
+function (t) {
+  this.a.set(out(P(t, 46.0, 46.45))); this.b.set(out(P(t, 46.25, 46.7))); this.c.set(out(P(t, 46.4, 46.85))); this.d.set(out(P(t, 46.6, 47.0)));
+  this.c.i.style.fontSize = '24px'; this.c.i.style.color = '#94A3B8';
+});
+
+/* global overlays */
+const TAG = el('div', 'tag', VP, 'Actual MES workbook &nbsp;·&nbsp; demonstration dataset, fictional operational data');
+const COVER = el('div', 'cover', VP);
+
+/* ============================== seek ============================== */
+function seek(t) {
+  t = clamp(t, 0, DUR - 1e-6); let tag = 0;
+  for (const s of scenes) {
+    const on = t >= s.t0 && t < s.t1; s.root.style.display = on ? 'block' : 'none';
+    if (on) { s.update(t); tag = Math.max(tag, s.tag(t)); }
+  }
+  TAG.style.opacity = tag;
+  COVER.style.opacity = Math.max(1 - out(P(t, 0, .6)), inn(P(t, 47.3, 48)));
+}
+window.seek = seek;
+
+/* decode every image before the first frame so seek(t) is always complete */
+window.__ready = (async () => {
+  await document.fonts.ready;
+  // decode sequentially (parallel decode of many large images can fail in headless Chromium), with retry
+  window.__imgs = {};
+  for (const [k, s] of Object.entries(SC)) {
+    for (let tries = 0; ; tries++) {
+      const i = new Image(); i.src = s.src;
+      try { await i.decode(); window.__imgs[k] = i; break; } catch (e) { if (tries > 4) throw e; await new Promise(r => setTimeout(r, 200)); }
+    }
+  }
+  for (const i of VP.querySelectorAll('img')) { try { await i.decode(); } catch (e) {} }
+  seek(0); return true;
+})();
+
+/* ============================== preview player + spec ============================== */
+const RENDER = new URLSearchParams(location.search).has('render');
+if (RENDER) document.body.classList.add('render');
+else {
+  const wrap = document.getElementById('wrap');
+  const fitVP = () => { const s = Math.min(1, (innerWidth - 0) / W); VP.style.transform = `scale(${s})`; wrap.style.height = H * s + 'px'; };
+  addEventListener('resize', fitVP); fitVP();
+  const aud = document.getElementById('aud'); if (ASSETS.audio) aud.src = ASSETS.audio;
+  const sc = document.getElementById('scrub'), tc = document.getElementById('tc'), pb = document.getElementById('play');
+  let playing = false, t0 = 0, p0 = 0;
+  const label = t => `${t.toFixed(2)} s · bar ${Math.floor(t / BAR) + 1} beat ${Math.floor((t % BAR) / BEAT) + 1}`;
+  const show = t => { seek(t); sc.value = t; tc.textContent = label(t); };
+  sc.oninput = () => { playing = false; pb.textContent = 'Play'; aud.pause(); show(+sc.value); };
+  pb.onclick = () => {
+    playing = !playing; pb.textContent = playing ? 'Pause' : 'Play';
+    if (playing) { p0 = +sc.value >= DUR - .05 ? 0 : +sc.value; t0 = performance.now(); if (ASSETS.audio) { aud.currentTime = p0; aud.play(); } }
+    else aud.pause();
+  };
+  const loop = () => { if (playing) { let t = ASSETS.audio && !aud.paused ? aud.currentTime : p0 + (performance.now() - t0) / 1000;
+      if (t >= DUR) { playing = false; pb.textContent = 'Play'; t = DUR - .001; } show(t); } requestAnimationFrame(loop); };
+  window.__ready.then(() => { show(0); loop(); });
+  renderSpec();
+}
+function renderSpec() {
+  const m = STORY.meta, e = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const rows = STORY.shots.map(s => `<tr><td><b>${s.id}</b><br>${s.t0.toFixed(1)}–${s.t1.toFixed(1)} s<br>bars ${s.bars}<br>${e(s.beats)}</td>
+    <td><b>${e(s.section)}</b><br>${e(s.visual)}</td><td>${e(s.source)}</td><td>${e(s.camera)}</td><td>${e(s.transition)}</td>
+    <td>${s.text.map(e).join('<br>')}</td><td>${e(s.sound)}</td><td>${e(s.purpose)}</td></tr>`).join('');
+  const sfx = STORY.sfx.map(x => `<tr><td>${x.t.toFixed(3)} s</td><td>${x.file}</td><td>${x.gain_db} dB</td><td>peak-aligned (offset from analysis.json)</td></tr>`).join('');
+  document.getElementById('spec').innerHTML = `
+  <h2>Production specification</h2>
+  <p>${m.duration_s} s · ${m.resolution.join('×')} · ${m.fps} fps · ${m.bpm} BPM (1 bar = ${m.bar_s} s, 1 beat = ${m.beat_s} s) · 24 bars. Every cut sits on a downbeat or on beat 3.</p>
+  <p><span class="sw" style="background:${m.background}"></span>Stage ${m.background} &nbsp; <span class="sw" style="background:${m.accent}"></span>Accent ${m.accent} (the primary series colour of the workbook's own charts) &nbsp; <span class="sw" style="background:${m.accent_on_dark}"></span>Accent tint on dark ${m.accent_on_dark} &nbsp; <span class="sw" style="background:#0F2A4A"></span>Workbook navy #0F2A4A (appears only inside screenshots)</p>
+  <p>Typography: ${e(m.font)}. Headlines 88/64/44 px SemiBold, tracking −0.035 to −0.025 em; labels 18 px Medium, uppercase, +0.16 em. No full stops on screen. Masked reveals only (text rises into a clipping box, ease-out cubic, 0.4–0.5 s). No bounce, no glow, no shake, no particles.</p>
+  <p>Music: ${e(m.music)} — ${e(m.music_offset_note)}. SFX are aligned by their measured peak, not their file start.</p>
+  <h2>Storyboard</h2>
+  <table><tr><th>Shot / time</th><th>Visual</th><th>Source asset</th><th>Camera</th><th>Transition</th><th>On-screen text</th><th>Sound</th><th>Purpose</th></tr>${rows}</table>
+  <h2>SFX cue sheet</h2><table><tr><th>Time</th><th>File</th><th>Gain</th><th>Alignment</th></tr>${sfx}</table>
+  <h2>Rendering</h2>
+  <p>1 · <code>python3 tools/render_video.py</code> opens this file with <code>?render=1</code> in headless Chromium at 1920×1080, waits for <code>window.__ready</code>, calls <code>seek(i/60)</code> for every frame, screenshots, and pipes the frames into ffmpeg (H.264, yuv420p). Optional <code>--sub 3</code> renders temporal sub-frames at t−1/240, t, t+1/240 and averages them (motion blur).</p>
+  <p>2 · <code>python3 tools/mix_audio.py</code> trims the music to the measured first downbeat, places each SFX by its measured peak, and loudness-normalises to −14 LUFS / −1 dBTP.</p>
+  <p>3 · ffmpeg muxes video + mix into <code>output/mes_case_study_48s.mp4</code>. See video/README.md for exact commands.</p>`;
+}
+</script>
+</body>
+</html>
