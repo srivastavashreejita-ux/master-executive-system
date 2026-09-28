@@ -2,8 +2,8 @@
 
 | File | What it is |
 |---|---|
-| `SIP_Story_Deck.pptx` | 35-slide story deck (14 acts) with full speaker notes on every slide |
-| `SIP_Viva_Guide.docx` | Viva guide: 60-second pitch, numbers to know, 20 concepts with formulas and worked examples, 22-question bank, slide-by-slide script |
+| `SIP_Story_Deck.pptx` | 38-slide story deck (14 acts) with full speaker notes on every slide |
+| `SIP_Viva_Guide.docx` | Viva guide: 60-second pitch, JHS and what I learnt there, numbers to know, 20 concepts with formulas and worked examples, 22-question bank, slide-by-slide script |
 | `source/` | Generator scripts, plant photos and screenshot crops used to build both files |
 
 The whole deck follows one case from the workbook's demonstration dataset:
@@ -14,7 +14,8 @@ four pack fields → PR-2026-00630 → handle lot HL-DBR-26-0519 → 3 runs, 8,6
 - **Slide 19 (video):** no workflow video was supplied, so the slide has a styled placeholder frame.
   Insert the video in PowerPoint (Insert > Video > This Device), size it over the frame, and delete the small grey hint line.
 - Photos used: the four plant photographs supplied (aerial, two rooftop views, tube filling line).
-  Moulding, tufting and warehouse photos can be swapped in on slides 9–10 if available.
+  Moulding, tufting and warehouse photos can be swapped into the mosaic on slide 9 if available.
+- Slide 8 (Who is JHS?) uses public company facts (established 1997, contract manufacturer, clients such as Amway India and Dabur India). Confirm them with the external guide.
 
 ## Rebuilding
 ```bash

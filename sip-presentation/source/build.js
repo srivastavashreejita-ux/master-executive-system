@@ -27,7 +27,7 @@ const ctx = {
     ["JHS-26433", "Dabur Red Toothbrush — Soft", "White", "04-Sep-26"],
   ],
   plantDesc: "Oral care: toothpaste, toothbrushes, mouthwash",
-  plantSay: "JHS is an oral-care manufacturer making toothpaste, toothbrushes and mouthwash, with its corporate office in New Delhi.",
+  plantSay: "",
   duration: "Seven weeks, 1 June – 17 July 2026",
   registerFormat: "Both. Each function kept its own departmental register or spreadsheet. The records were generally accurate. The issue was that they weren't connected to each other.",
   actualCountSource: "It's the output registered for that cycle, about 40,000 units. That's why I keep the approximate figure rather than implying false precision.",

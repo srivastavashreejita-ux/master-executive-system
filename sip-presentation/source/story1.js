@@ -239,9 +239,214 @@ module.exports = function (pres, ctx) {
       why: `The panel needs to know this is grounded in a real plant. The system was designed around JHS's actual flow.`,
       notice: `The aerial view: several production blocks, warehousing and utilities on one campus. Information has to move between all of them.`,
       q: [["What exactly was your role?", "I was an operations intern. I studied the process, observed a production line, gathered requirements from the people using the records, and designed and built the MES prototype."]],
-      next: `The first thing I tried to understand was how material physically moves through the plant.`,
+      next: `Let me tell you briefly who JHS is.`,
     });
     folio(s, n++);
+  }
+
+  // 7a. Who is JHS?
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.paper };
+    act(s, 3, "Enter the plant");
+    question(s, "Who is JHS?");
+    const facts = [
+      ["Since 1997", "Started as a toothbrush manufacturer; now makes the full oral-care range."],
+      ["Contract manufacturer", "Makes oral-care products for domestic and international brands, such as Amway India and Dabur India, as well as its own."],
+      ["Kala-Amb, Himachal Pradesh", "Manufacturing location, where I was placed. Corporate office in New Delhi."],
+    ];
+    facts.forEach((f, i) => {
+      const y = 1.75 + i * 1.5;
+      s.addText(f[0], { x: 0.6, y, w: 4.3, h: 0.5, fontFace: F.head, fontSize: 22, color: i === 1 ? C.signal : C.text, margin: 0, isTextBox: true });
+      s.addText(f[1], { x: 0.6, y: y + 0.5, w: 4.2, h: 0.85, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
+    });
+    s.addText("THREE PRODUCT LINES, THREE KINDS OF PROCESS", { x: 5.4, y: 1.75, w: 7.3, h: 0.28, fontFace: F.body, fontSize: 10, bold: true, color: C.mute, charSpacing: 3, margin: 0, isTextBox: true });
+    const lines = [
+      ["Toothpaste", "High-volume lines", ["Dispensing", "Blending", "Homogenisation", "Tube filling"]],
+      ["Toothbrushes", "Assembled from components", ["Handle moulding", "Tufting", "Trimming", "Cap assembly", "Packing"]],
+      ["Mouthwash", "Lower-volume, order-based", ["Single line"]],
+    ];
+    lines.forEach((l, i) => {
+      const y = 2.2 + i * 1.3;
+      s.addShape("rect", { x: 5.4, y, w: 7.33, h: 1.1, fill: { color: i === 1 ? C.ink : C.white }, line: { color: i === 1 ? C.ink : C.rule, width: 0.75 } });
+      s.addText([{ text: l[0], options: { bold: true, fontSize: 16, color: i === 1 ? C.white : C.text, breakLine: true } }, { text: l[1], options: { fontSize: 11, color: i === 1 ? "AEB4B9" : C.mute } }],
+        { x: 5.6, y: y + 0.12, w: 1.8, h: 0.86, fontFace: F.body, margin: 0, valign: "middle", isTextBox: true });
+      let cx = 7.45;
+      l[2].forEach((st, j) => {
+        const w = 0.2 + st.length * 0.068;
+        s.addShape("roundRect", { x: cx, y: y + 0.36, w, h: 0.38, rectRadius: 0.19, fill: { color: i === 1 ? "2A3138" : C.paper }, line: { type: "none" } });
+        s.addText(st, { x: cx, y: y + 0.36, w, h: 0.38, fontFace: F.body, fontSize: 10, color: i === 1 ? C.white : C.text, align: "center", valign: "middle", margin: 0, isTextBox: true });
+        cx += w + (j < l[2].length - 1 ? 0.16 : 0);
+        if (j < l[2].length - 1) s.addText("›", { x: cx - 0.16, y: y + 0.36, w: 0.16, h: 0.38, fontFace: F.body, fontSize: 12, color: C.signal, align: "center", valign: "middle", margin: 0, isTextBox: true });
+      });
+    });
+    s.addText("When you manufacture under other companies' brands, being able to trace any pack back to the run that made it matters to the client as much as to the plant.", {
+      x: 5.4, y: 6.2, w: 7.33, h: 0.75, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, valign: "top", isTextBox: true,
+    });
+    folio(s, n++);
+    notes(s, {
+      say: `Briefly, who JHS is. JHS Svendgaard started in 1997 as a toothbrush manufacturer and today makes the full oral-care range. A large part of its business is contract manufacturing: it makes toothpaste, toothbrushes and mouthwash for other brands, in India and abroad, as well as its own. The manufacturing is at Kala-Amb, where I was, and the corporate office is in New Delhi. The three product lines work very differently. Toothpaste runs on high-volume lines: dispensing, blending, homogenisation, then tube filling. A toothbrush is assembled from components: the handle is moulded, bristles are tufted and trimmed, then the cap goes on and it's packed. Mouthwash is a lower-volume, order-based single line. The point for my project is the last line on the slide. When the product carries a client's brand, a complaint is the client's complaint too, so traceability is part of the relationship, not an admin task.`,
+      why: `It sets up why traceability matters commercially, not just operationally, before the panel sees any problem.`,
+      notice: `The toothbrush line, highlighted, is the one the whole case study follows.`,
+      q: [
+        ["Which brands does JHS make for?", "Publicly, the company names clients such as Amway India and Dabur India in the domestic market. In my workbook, Amway, Chicco and Dabur are modelled as client accounts, but with fictional data."],
+        ["Why does contract manufacturing make traceability more important?", "Because the brand owner answers to the consumer. If a pack is complained about, the client will expect the manufacturer to identify the run, the materials and the QC record quickly, and to scope any recall precisely."],
+      ],
+      next: `Here's what that looks like on the ground.`,
+    });
+  }
+
+  // 9. Photo mosaic
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.ink };
+    const g = 0.08;
+    s.addImage({ path: P.yard, x: 0, y: 0, w: 8.2, h: H, sizing: { type: "cover", w: 8.2, h: H } });
+    s.addImage({ path: P.machine, x: 8.2 + g, y: 0, w: W - 8.2 - g, h: 3.7, sizing: { type: "cover", w: W - 8.2 - g, h: 3.7 } });
+    s.addImage({ path: P.skyline, x: 8.2 + g, y: 3.7 + g, w: W - 8.2 - g, h: H - 3.7 - g, sizing: { type: "cover", w: W - 8.2 - g, h: H - 3.7 - g } });
+    s.addShape("rect", { x: 0.45, y: 5.05, w: 7.3, h: 1.95, fill: { color: "000000", transparency: 22 }, line: { type: "none" } });
+    s.addText("What does it look like on the ground?", { x: 0.7, y: 5.2, w: 6.9, h: 0.5, fontFace: F.head, fontSize: 22, color: C.white, margin: 0, isTextBox: true });
+    s.addText("Stores, production blocks, QC, packing and dispatch spread across one campus. Material moves between them all day, and each hand-over leaves a record behind.", {
+      x: 0.7, y: 5.75, w: 6.9, h: 1.1, fontFace: F.body, fontSize: 13, color: "D5D9DC", margin: 0, valign: "top", isTextBox: true,
+    });
+    s.addShape("rect", { x: 8.2 + g, y: 3.28, w: W - 8.2 - g, h: 0.42, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
+    s.addText("Tube filling line, paste plant", { x: 8.45, y: 3.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
+    s.addShape("rect", { x: 8.2 + g, y: H - 0.5, w: W - 8.2 - g, h: 0.5, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
+    s.addText("Kala-Amb industrial belt from the plant roof", { x: 8.45, y: H - 0.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
+    folio(s, n++, true);
+    notes(s, {
+      say: `These are photographs from the plant. On the left is the yard between production blocks, where material moves between stores, production and dispatch all day. Top right is a tube filling line in the paste plant: empty tubes come in from the hopper, then get filled, coded and sealed. Bottom right is the Kala-Amb industrial belt from the roof. Every one of these operations creates records: what was run, what material was used, what was rejected, when the machine stopped.`,
+      why: `It shows the panel I was physically on the floor, and that the system is built around real operations.`,
+      notice: `The scale: several blocks, several lines and several shifts. Connecting the information by hand is slow.`,
+      q: [["Was the MES deployed on these lines?", "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."]],
+      next: `So how did I spend my seven weeks there?`,
+    });
+  }
+
+  // 7b. Seven weeks
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.white };
+    act(s, 3, "Enter the plant");
+    question(s, "How did I spend seven weeks there?");
+    s.addText("1 JUNE", { x: 0.6, y: 1.72, w: 2, h: 0.3, fontFace: F.body, fontSize: 10.5, bold: true, color: C.mute, charSpacing: 3, margin: 0, isTextBox: true });
+    s.addText("17 JULY 2026", { x: 10.7, y: 1.72, w: 2.03, h: 0.3, fontFace: F.body, fontSize: 10.5, bold: true, color: C.mute, charSpacing: 3, align: "right", margin: 0, isTextBox: true });
+    const ph = [
+      ["Plant induction", "Supply chain, inbound and warehouse, the QC / QA / microbiology labs, paste, moulding and tufting"],
+      ["Line study", "One 12-hour operating cycle on the main toothpaste line"],
+      ["Problem definition", "Where information is created, and where it breaks"],
+      ["Build", "The MES: 27 sheets, five layers"],
+      ["Test & refine", "Scenario tests; identification logic reworked"],
+    ];
+    const pw = 12.13 / ph.length;
+    ph.forEach((p, i) => {
+      const x = 0.6 + i * pw;
+      s.addShape("rect", { x: x + 0.02, y: 2.1, w: pw - 0.04, h: 0.16, fill: { color: i === 0 ? C.signal : i < 3 ? "8A949C" : C.ink }, line: { type: "none" } });
+      s.addText(p[0], { x, y: 2.42, w: pw - 0.2, h: 0.4, fontFace: F.head, fontSize: 17, color: C.text, margin: 0, isTextBox: true });
+      s.addText(p[1], { x, y: 2.85, w: pw - 0.25, h: 1.1, fontFace: F.body, fontSize: 12, color: C.steel, margin: 0, valign: "top", isTextBox: true });
+    });
+    s.addText("Sequence, not to scale", { x: 0.6, y: 4.0, w: 3, h: 0.25, fontFace: F.body, fontSize: 9, italic: true, color: C.mute, margin: 0, isTextBox: true });
+    s.addShape("rect", { x: 0.6, y: 4.55, w: 7.4, h: 2.35, fill: { color: C.paper }, line: { type: "none" } });
+    s.addText("“Exposure first, project second.”", { x: 0.85, y: 4.75, w: 7.0, h: 0.55, fontFace: F.head, fontSize: 22, italic: true, color: C.signal, margin: 0, isTextBox: true });
+    s.addText("The brief was broad when I arrived. It only took its final shape once I understood how information actually moves through the plant.", {
+      x: 0.85, y: 5.35, w: 6.9, h: 1.3, fontFace: F.body, fontSize: 14, color: C.text, margin: 0, valign: "top", isTextBox: true,
+    });
+    const g = [["ROLE", "Operations intern, Operations Department"], ["EXTERNAL GUIDE", "Mr. Paramveer Singh, Chief Executive Officer, JHS Svendgaard"], ["INTERNAL GUIDE", "Dr. Vineet Tiwari, Associate Professor, IIIT Allahabad"]];
+    g.forEach((x, i) => {
+      s.addText(x[0], { x: 8.45, y: 4.6 + i * 0.78, w: 4.3, h: 0.25, fontFace: F.body, fontSize: 9.5, bold: true, color: C.mute, charSpacing: 2, margin: 0, isTextBox: true });
+      s.addText(x[1], { x: 8.45, y: 4.85 + i * 0.78, w: 4.3, h: 0.45, fontFace: F.body, fontSize: 12.5, color: C.text, margin: 0, valign: "top", isTextBox: true });
+    });
+    folio(s, n++);
+    notes(s, {
+      say: `This is how the seven weeks were spent, from the first of June to the seventeenth of July. It started with a structured plant induction: supply chain, inbound and warehouse, the quality labs, and the paste, moulding and tufting plants. Then I observed one full operating cycle on the main toothpaste line. From that came the problem definition, then the build, then testing and refinement. I want you to notice the order: exposure first, project second. The brief was broad when I arrived. It only took its final shape once I understood how information moves through the plant. My external guide was Mr. Paramveer Singh, and my internal guide was Dr. Vineet Tiwari.`,
+      why: `It shows the project came out of the plant, not the other way round. It also answers "what did you actually do all day?" before anyone asks.`,
+      notice: `The first bar, the induction, is highlighted. Everything else depended on it.`,
+      q: [
+        ["How much time did the induction take?", "It was the first part of the internship. I haven't put exact weeks on the slide because the phases overlapped. For example, I kept going back to the floor while building."],
+        ["Was the MES your assigned project from day one?", "No. The brief was broad: understand how the plant operates and how information moves, then translate that into a working digital system. The MES took shape after the induction and the line study."],
+      ],
+      next: `The induction came first, and it taught me things I didn't expect.`,
+    });
+  }
+
+  // 7c. What the induction taught me
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.paper };
+    act(s, 3, "Enter the plant");
+    question(s, "What did the induction teach me before the project began?");
+    const cards = [
+      ["Planning & procurement", "Planning and buying are deliberately separated. The plan says what is needed; procurement decides how to get it.", "Work orders that production runs are logged against"],
+      ["Inbound & warehouse", "A material gets a traceable identity at the gate, before it's allowed into storage: verification, weighment, quarantine, sampling, a traceability label.", "The GRN register and lot identity from receipt"],
+      ["QC laboratory", "Testing a material and releasing a batch are two different decisions, made and recorded separately.", "QC status and release status as separate fields"],
+      ["Quality assurance", "Line clearance is graded, A and B. A retained sample of every batch is kept through expiry, so a complaint months later can be checked against evidence.", "Complaints linked to the exact run"],
+      ["Maintenance & losses", "The plant measures its own losses through OEE and Total Productive Maintenance.", "Downtime as events; the OEE module"],
+    ];
+    const cw = 3.95, chh = 2.3, gx = 0.14, gy = 0.2;
+    cards.forEach((c, i) => {
+      const x = 0.6 + (i % 3) * (cw + gx), y = 1.75 + Math.floor(i / 3) * (chh + gy);
+      s.addShape("rect", { x, y, w: cw, h: chh, fill: { color: C.white }, line: { color: C.rule, width: 0.75 } });
+      s.addText(String(i + 1).padStart(2, "0"), { x: x + 0.22, y: y + 0.15, w: 0.6, h: 0.35, fontFace: F.head, fontSize: 15, color: C.faint, margin: 0, isTextBox: true });
+      s.addText(c[0], { x: x + 0.72, y: y + 0.15, w: cw - 0.9, h: 0.35, fontFace: F.head, fontSize: 16, color: C.text, margin: 0, isTextBox: true });
+      s.addText(c[1], { x: x + 0.22, y: y + 0.6, w: cw - 0.44, h: 1.15, fontFace: F.body, fontSize: 12, color: C.steel, margin: 0, valign: "top", isTextBox: true });
+      s.addText([{ text: "LATER IN THE MES  ", options: { bold: true, color: C.signal, fontSize: 8.5, charSpacing: 1 } }, { text: c[2], options: { color: C.text, fontSize: 10.5 } }],
+        { x: x + 0.22, y: y + chh - 0.5, w: cw - 0.44, h: 0.4, fontFace: F.body, margin: 0, valign: "top", isTextBox: true });
+    });
+    const x6 = 0.6 + 2 * (cw + gx), y6 = 1.75 + chh + gy;
+    s.addShape("rect", { x: x6, y: y6, w: cw, h: chh, fill: { color: C.ink }, line: { type: "none" } });
+    s.addText("THE COMMON THREAD", { x: x6 + 0.25, y: y6 + 0.2, w: cw - 0.5, h: 0.3, fontFace: F.body, fontSize: 10, bold: true, color: C.signal, charSpacing: 3, margin: 0, isTextBox: true });
+    s.addText("Every record exists because some later activity will need it.", { x: x6 + 0.25, y: y6 + 0.6, w: cw - 0.5, h: 1.5, fontFace: F.head, fontSize: 19, color: C.white, margin: 0, valign: "top", isTextBox: true });
+    folio(s, n++);
+    notes(s, {
+      say: `Before the project had a shape, the induction taught me how the functions around production work. In planning and procurement, planning and buying are deliberately kept separate: the plan says what's needed, procurement decides how to get it. At the inbound gate, a material gets its traceable identity before it's allowed into storage: it's verified, weighed, quarantined, sampled and labelled. In the QC lab, I learned that testing a material and releasing a batch are two different decisions, recorded separately. In QA, line clearance is graded, A and B, and a retained sample of every batch is kept through expiry, so a complaint months later can be checked against physical evidence. And the plant already measures its own losses through OEE and TPM. The common thread, and probably the most useful thing I learned there: every record exists because some later activity is going to need it.`,
+      why: `This is manufacturing knowledge I didn't have before the internship, and each point later shaped a specific part of the system.`,
+      notice: `The orange line at the bottom of each card. That's where the learning ended up in the MES.`,
+      q: [
+        ["What's the difference between QC and QA?", "QC tests: it checks a material or product against specification and records the result. QA decides: it reviews the batch record, line clearance and QC results, and releases or holds the batch. They're separate decisions, so the MES keeps QC status and release status as separate fields."],
+        ["What is line clearance?", "Before a new batch starts, the line is checked and cleared of the previous product's materials, labels and documents, so nothing gets mixed up. At JHS it's graded into A and B levels. (Explain the A/B criteria as the plant's SOP defines them.)"],
+        ["Why keep a retained sample?", "So that if a complaint arrives months later, QA can test the same batch against what the customer reports. It's physical evidence to go with the records."],
+        ["What is TPM?", "Total Productive Maintenance: an approach where operators and maintenance work together to prevent losses, such as breakdowns, minor stops and speed loss, rather than only fixing failures. OEE is the measure it uses."],
+      ],
+      next: `Then came the three plants, where the product is actually made.`,
+    });
+  }
+
+  // 8b. Plant exposure — observation → requirement
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.paper };
+    act(s, 3, "Enter the plant");
+    question(s, "What did the plant teach me about the system?");
+    s.addText("WHAT I OBSERVED", { x: 2.95, y: 1.6, w: 4.6, h: 0.28, fontFace: F.body, fontSize: 10, bold: true, color: C.mute, charSpacing: 3, margin: 0, isTextBox: true });
+    s.addText("WHAT THE MES HAD TO DO", { x: 8.1, y: 1.6, w: 4.6, h: 0.28, fontFace: F.body, fontSize: 10, bold: true, color: C.signal, charSpacing: 3, margin: 0, isTextBox: true });
+    const rows = [
+      ["01", "Paste plant", "Material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. QC testing and QA release are separate decisions.", "Key every register. Link each material issue to the run that used it. Record QC result and release separately."],
+      ["02", "Moulding", "A brush first gets its identity at the handle lot. One moulding lot is consumed by one to three assembly runs.", "Carry the handle lot on every production record. Trace a lot to every run it reached."],
+      ["03", "Tufting", "Filament is anchored into the handle and trimmed. Bristle retention is decided here.", "Record the tufting machine, bristle supplier, filament and anchor-wire lots, and classify defects by stage."],
+    ];
+    rows.forEach((r, i) => {
+      const y = 2.05 + i * 1.55;
+      if (i > 0) s.addShape("line", { x: 0.6, y: y - 0.2, w: 12.13, h: 0, line: { color: C.rule, width: 0.75 } });
+      s.addText(r[0], { x: 0.6, y, w: 0.8, h: 0.6, fontFace: F.head, fontSize: 28, color: i === 2 ? C.signal : C.faint, margin: 0, valign: "top", isTextBox: true });
+      s.addText(r[1], { x: 1.4, y: y + 0.05, w: 1.5, h: 0.5, fontFace: F.head, fontSize: 18, color: C.text, margin: 0, valign: "top", isTextBox: true });
+      s.addText(r[2], { x: 2.95, y, w: 4.7, h: 1.2, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
+      s.addText("→", { x: 7.6, y, w: 0.45, h: 0.45, fontFace: F.body, fontSize: 18, color: C.signal, margin: 0, align: "center", isTextBox: true });
+      s.addText(r[3], { x: 8.1, y, w: 4.6, h: 1.2, fontFace: F.body, fontSize: 13, bold: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
+    });
+    s.addText("Tufting is where the bristle complaint points. Every field on the manufacturing record can be traced back to something seen on the floor.", {
+      x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, isTextBox: true,
+    });
+    folio(s, n++);
+    notes(s, {
+      say: `Then the three plants. This slide is the one the design rests on. My exposure was observational: I was there to understand where information is created, not to run equipment. In the paste plant, I saw that material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. I also saw that QC testing and QA release are two different decisions, recorded separately. In moulding, the brush first gets its identity at the handle lot, and one moulding lot feeds up to three assembly runs. That's why reverse traceability matters. And in tufting, bristle retention is decided at the anchoring operation, which is exactly what our complaint is about. The right-hand column is the point: each observation became a specific requirement for the system.`,
+      why: `It shows the design came from the floor, not from a template.`,
+      notice: `Row 03. The complaint from the opening slide leads straight here.`,
+      q: [
+        ["Did you work on the machines?", "No, the exposure was observational. I studied the process and the records each stage creates."],
+        ["What's the difference between QC and QA?", "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."],
+      ],
+      next: `Put together, this is how material moves through the plant.`,
+    });
   }
 
   // 8. Material flow
@@ -281,74 +486,9 @@ module.exports = function (pres, ctx) {
       why: `This is where I realised the problem wasn't a lack of data.`,
       notice: `Six stages, six records. The link between them is the part that's missing.`,
       q: [["How did you map this flow?", "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."]],
-      next: `During the induction I spent time in three plants in particular, and each one changed what the system had to do.`,
+      next: `And that's what led me to the real finding.`,
     });
     folio(s, n++);
-  }
-
-  // 8b. Plant exposure — observation → requirement
-  {
-    const s = pres.addSlide();
-    s.background = { color: C.paper };
-    act(s, 3, "Enter the plant");
-    question(s, "What did the plant teach me about the system?");
-    s.addText("WHAT I OBSERVED", { x: 2.95, y: 1.6, w: 4.6, h: 0.28, fontFace: F.body, fontSize: 10, bold: true, color: C.mute, charSpacing: 3, margin: 0, isTextBox: true });
-    s.addText("WHAT THE MES HAD TO DO", { x: 8.1, y: 1.6, w: 4.6, h: 0.28, fontFace: F.body, fontSize: 10, bold: true, color: C.signal, charSpacing: 3, margin: 0, isTextBox: true });
-    const rows = [
-      ["01", "Paste plant", "Material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. QC testing and QA release are separate decisions.", "Key every register. Link each material issue to the run that used it. Record QC result and release separately."],
-      ["02", "Moulding", "A brush first gets its identity at the handle lot. One moulding lot is consumed by one to three assembly runs.", "Carry the handle lot on every production record. Trace a lot to every run it reached."],
-      ["03", "Tufting", "Filament is anchored into the handle and trimmed. Bristle retention is decided here.", "Record the tufting machine, bristle supplier, filament and anchor-wire lots, and classify defects by stage."],
-    ];
-    rows.forEach((r, i) => {
-      const y = 2.05 + i * 1.55;
-      if (i > 0) s.addShape("line", { x: 0.6, y: y - 0.2, w: 12.13, h: 0, line: { color: C.rule, width: 0.75 } });
-      s.addText(r[0], { x: 0.6, y, w: 0.8, h: 0.6, fontFace: F.head, fontSize: 28, color: i === 2 ? C.signal : C.faint, margin: 0, valign: "top", isTextBox: true });
-      s.addText(r[1], { x: 1.4, y: y + 0.05, w: 1.5, h: 0.5, fontFace: F.head, fontSize: 18, color: C.text, margin: 0, valign: "top", isTextBox: true });
-      s.addText(r[2], { x: 2.95, y, w: 4.7, h: 1.2, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
-      s.addText("→", { x: 7.6, y, w: 0.45, h: 0.45, fontFace: F.body, fontSize: 18, color: C.signal, margin: 0, align: "center", isTextBox: true });
-      s.addText(r[3], { x: 8.1, y, w: 4.6, h: 1.2, fontFace: F.body, fontSize: 13, bold: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
-    });
-    s.addText("Tufting is where the bristle complaint points. Every field on the manufacturing record can be traced back to something seen on the floor.", {
-      x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, isTextBox: true,
-    });
-    folio(s, n++);
-    notes(s, {
-      say: `This slide is the one the design rests on. My exposure was observational: I was there to understand where information is created, not to run equipment. In the paste plant, I saw that material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. I also saw that QC testing and QA release are two different decisions, recorded separately. In moulding, the brush first gets its identity at the handle lot, and one moulding lot feeds up to three assembly runs. That's why reverse traceability matters. And in tufting, bristle retention is decided at the anchoring operation, which is exactly what our complaint is about. The right-hand column is the point: each observation became a specific requirement for the system.`,
-      why: `It shows the design came from the floor, not from a template.`,
-      notice: `Row 03. The complaint from the opening slide leads straight here.`,
-      q: [
-        ["Did you work on the machines?", "No, the exposure was observational. I studied the process and the records each stage creates."],
-        ["What's the difference between QC and QA?", "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."],
-      ],
-      next: `Here's what that looks like on the ground.`,
-    });
-  }
-
-  // 9. Photo mosaic
-  {
-    const s = pres.addSlide();
-    s.background = { color: C.ink };
-    const g = 0.08;
-    s.addImage({ path: P.yard, x: 0, y: 0, w: 8.2, h: H, sizing: { type: "cover", w: 8.2, h: H } });
-    s.addImage({ path: P.machine, x: 8.2 + g, y: 0, w: W - 8.2 - g, h: 3.7, sizing: { type: "cover", w: W - 8.2 - g, h: 3.7 } });
-    s.addImage({ path: P.skyline, x: 8.2 + g, y: 3.7 + g, w: W - 8.2 - g, h: H - 3.7 - g, sizing: { type: "cover", w: W - 8.2 - g, h: H - 3.7 - g } });
-    s.addShape("rect", { x: 0.45, y: 5.05, w: 7.3, h: 1.95, fill: { color: "000000", transparency: 22 }, line: { type: "none" } });
-    s.addText("What does it look like on the ground?", { x: 0.7, y: 5.2, w: 6.9, h: 0.5, fontFace: F.head, fontSize: 22, color: C.white, margin: 0, isTextBox: true });
-    s.addText("Stores, production blocks, QC, packing and dispatch spread across one campus. Material moves between them all day, and each hand-over leaves a record behind.", {
-      x: 0.7, y: 5.75, w: 6.9, h: 1.1, fontFace: F.body, fontSize: 13, color: "D5D9DC", margin: 0, valign: "top", isTextBox: true,
-    });
-    s.addShape("rect", { x: 8.2 + g, y: 3.28, w: W - 8.2 - g, h: 0.42, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
-    s.addText("Tube filling line, paste plant", { x: 8.45, y: 3.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
-    s.addShape("rect", { x: 8.2 + g, y: H - 0.5, w: W - 8.2 - g, h: 0.5, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
-    s.addText("Kala-Amb industrial belt from the plant roof", { x: 8.45, y: H - 0.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
-    folio(s, n++, true);
-    notes(s, {
-      say: `These are photographs from the plant. On the left is the yard between production blocks, where material moves between stores, production and dispatch all day. Top right is a tube filling line in the paste plant: empty tubes come in from the hopper, then get filled, coded and sealed. Bottom right is the Kala-Amb industrial belt from the roof. Every one of these operations creates records: what was run, what material was used, what was rejected, when the machine stopped.`,
-      why: `It shows the panel I was physically on the floor, and that the system is built around real operations.`,
-      notice: `The scale: several blocks, several lines and several shifts. Connecting the information by hand is slow.`,
-      q: [["Was the MES deployed on these lines?", "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."]],
-      next: `And spending time here is what led me to the real finding.`,
-    });
   }
 
   // ───────────────── ACT 4 — THE DISCOVERY ─────────────────

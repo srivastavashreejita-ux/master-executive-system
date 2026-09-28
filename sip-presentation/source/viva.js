@@ -52,7 +52,7 @@ body.push(new Paragraph({ spacing: { after: 240 }, children: [r("From a complain
 body.push(p("Development of an Excel-based Manufacturing Execution System at JHS Svendgaard Laboratories Ltd., Operations Department, Kala-Amb, Himachal Pradesh", { size: 26, color: MUTE }));
 body.push(p([r("Shreejita Srivastava", { bold: true }), r("  ·  MBA, IIIT Allahabad  ·  IMB2025026", { color: MUTE })], { before: 480 }));
 body.push(p("Internal guide: Dr. Vineet Tiwari  ·  External guide: Mr. Paramveer Singh", { color: MUTE }));
-body.push(p("Companion to SIP_Story_Deck.pptx (35 slides)", { color: MUTE, italics: true, before: 240 }));
+body.push(p("Companion to SIP_Story_Deck.pptx (38 slides)", { color: MUTE, italics: true, before: 240 }));
 body.push(new Paragraph({ children: [new PageBreak()] }));
 
 body.push(h1("Contents"));
@@ -70,8 +70,17 @@ body.push(box([
   "It's a working prototype on a demonstration dataset, not an enterprise MES, and I haven't claimed any time savings. The biggest lesson: the hard part wasn't the workbook. It was understanding the operation well enough to know what the system needed to answer.",
 ], TINT, { font: BODY, size: 22 }));
 
+// 1b. JHS and the internship
+body.push(h1("2. JHS and what I learnt there"));
+body.push(p("Facts about the company come from the company's public profile and from the plant induction. Confirm them with your external guide before the viva."));
+body.push(table(V.jhs.facts, [2300, W - 2300]));
+body.push(spacer());
+body.push(label("What the plant taught me, function by function"));
+body.push(table(V.jhs.learnt, [2300, W - 2300], ["Where", "What I learnt"]));
+body.push(new Paragraph({ children: [new PageBreak()] }));
+
 // 2. Numbers
-body.push(h1("2. Numbers to know cold"));
+body.push(h1("3. Numbers to know cold"));
 body.push(table(V.numbers, [2300, W - 2300], ["Item", "Figure"]));
 body.push(spacer());
 body.push(label("Traps to avoid"));
@@ -79,7 +88,7 @@ V.traps.forEach((t) => body.push(bullet(t)));
 body.push(new Paragraph({ children: [new PageBreak()] }));
 
 // 3. Concepts
-body.push(h1("3. Concepts and formulas"));
+body.push(h1("4. Concepts and formulas"));
 body.push(p("For each concept: what it is, the formula as used in the workbook, the variables, a worked example from the workbook, why it matters, and a line you can say to the panel. Worked examples use the story case PR-2026-00630 wherever possible, so every answer ties back to the deck."));
 V.concepts.forEach((c, i) => {
   body.push(h2(`${i + 1}. ${c.t}`));
@@ -94,7 +103,7 @@ V.concepts.forEach((c, i) => {
 body.push(new Paragraph({ children: [new PageBreak()] }));
 
 // 4. Questions
-body.push(h1("4. Viva question bank"));
+body.push(h1("5. Viva question bank"));
 body.push(p("Model answers in your own voice. Keep each to 30–45 seconds, then stop and let the panel follow up."));
 V.questions.forEach((q, i) => {
   body.push(new Paragraph({ spacing: { before: 200, after: 60 }, keepNext: true, children: [r(`Q${i + 1}. `, { bold: true, color: ORANGE }), r(q[0], { bold: true, font: HEAD, size: 24 })] }));
@@ -103,7 +112,7 @@ V.questions.forEach((q, i) => {
 body.push(new Paragraph({ children: [new PageBreak()] }));
 
 // 5. Script
-body.push(h1("5. Slide-by-slide speaker script"));
+body.push(h1("6. Slide-by-slide speaker script"));
 body.push(p("The same notes are in the deck's speaker notes. Read them aloud twice before the viva, then present from the slides, not from this page."));
 NOTES.forEach((nt, i) => {
   body.push(h2(`Slide ${i + 1}  ·  ${V.slideTitles[i]}`));

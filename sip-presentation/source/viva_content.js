@@ -184,7 +184,34 @@ module.exports.concepts = [
   },
 ];
 
+module.exports.jhs = {
+  facts: [
+    ["Company", "JHS Svendgaard Laboratories Ltd. Established 1997 as a toothbrush manufacturer; now makes the full oral-care range."],
+    ["Business model", "Contract manufacturing for domestic and international brands (publicly named clients include Amway India and Dabur India), plus its own brands."],
+    ["Products", "Toothpaste (high-volume: dispensing, blending, homogenisation, tube filling); toothbrushes (handle moulding, tufting, trimming, cap assembly, packing); mouthwash (lower-volume, order-based single line)."],
+    ["Where I was", "Operations Department, manufacturing location at Kala-Amb, Himachal Pradesh. Corporate office in New Delhi."],
+    ["When", "1 June – 17 July 2026 (seven weeks)."],
+    ["Guides", "External: Mr. Paramveer Singh, Chief Executive Officer, JHS Svendgaard. Internal: Dr. Vineet Tiwari, Associate Professor, IIIT Allahabad."],
+  ],
+  learnt: [
+    ["Planning & procurement", "Planning and buying are deliberately separated: the plan says what is needed, procurement decides how to get it. Material requirement planning connects the two."],
+    ["Inbound & warehouse", "A material gets a traceable identity at the gate before storage: gate verification, weighbridge, quarantine, sampling, traceability label."],
+    ["QC laboratory", "Testing a material and releasing a batch are different decisions, recorded separately."],
+    ["Quality assurance", "Line clearance is graded (A and B). A retained sample of every batch is kept through expiry so a later complaint can be investigated against evidence."],
+    ["Paste plant", "Material keeps its identity from weighbridge through release; high-volume lines where loss is measured against rated speed."],
+    ["Moulding", "A brush first gets its identity at the handle lot; one moulding lot is consumed by one to three assembly runs."],
+    ["Tufting", "Filament is anchored into the handle and trimmed; bristle retention is decided here."],
+    ["Maintenance & losses", "The plant quantifies its own losses through OEE and Total Productive Maintenance."],
+    ["Common thread", "Every record exists because some later activity will need it."],
+  ],
+};
+
 module.exports.questions = [
+  ["Tell us about JHS.", "JHS Svendgaard is an oral-care manufacturer, established in 1997 as a toothbrush maker. A large part of its business is contract manufacturing of toothpaste, toothbrushes and mouthwash for domestic and international brands, alongside its own. I was in the Operations Department at the Kala-Amb plant in Himachal Pradesh."],
+  ["What did you learn during the plant induction?", "Three things stand out. A material gets a traceable identity at the gate before it's stored. QC testing and QA release are separate decisions. And every record exists because a later activity needs it. Each of those later shaped part of the MES."],
+  ["What is the difference between QC and QA?", "QC tests a material or product against specification and records the result. QA reviews the batch record, line clearance and QC results, then releases or holds the batch. The MES keeps QC status and release status as separate fields for that reason."],
+  ["What is line clearance?", "Before a new batch starts, the line is checked and cleared of the previous product's materials, labels and documents so nothing is mixed up. JHS grades it into A and B levels. Explain the criteria as the plant's SOP defines them."],
+  ["Why does contract manufacturing make traceability more important?", "The brand owner answers to the consumer. When a complaint comes in, the client expects the manufacturer to identify the run, materials and QC record quickly and to scope any recall precisely."],
   ["Why Excel?", "It is what the plant already uses, it needs no new licences, infrastructure or IT approval, and people can use it without training. That let me build and test a working prototype within seven weeks. The value is in the data model: masters, registers, one key, one-directional flow. That carries over unchanged to any platform."],
   ["Why not SQL?", "SQL is the right destination for scale and multi-user use, and it's in my future scope. For an internship prototype, it would have needed a server, IT approval and user interfaces before anyone could test anything. I designed the workbook like a database, with one table per entity and a unique key, so migration is mostly a move, not a redesign. The sensible sequence is data discipline first, barcode capture second, then database migration."],
   ["Why not Power BI?", "Power BI is a presentation tool; it still needs a clean, connected data model underneath. The problem I found was the data structure, not the visualisation. Once the data is structured, Power BI can sit on top of it. That's future scope."],
@@ -234,8 +261,9 @@ module.exports.traps = [
 
 module.exports.slideTitles = [
   "Imagine a customer sends us this", "The complaint", "How do we find out what happened?", "What does the pack tell us?",
-  "Why isn't the Batch Number enough?", "What identifies one manufacturing occurrence?", "Where was I?", "How does material move through the plant?",
-  "What did the plant teach me about the system?", "What does it look like on the ground?", "The plant had the data", "Where was the information, and why was it slow to use?",
+  "Why isn't the Batch Number enough?", "What identifies one manufacturing occurrence?", "Where was I?", "Who is JHS?",
+  "What does it look like on the ground?", "How did I spend seven weeks there?", "What did the induction teach me before the project began?",
+  "What did the plant teach me about the system?", "How does material move through the plant?", "The plant had the data", "Where was the information, and why was it slow to use?",
   "What did twelve hours on one line show me?", "So where did 27,500 units go?", "What would the system need to answer?", "How did the project evolve?",
   "How did I structure it?", "What connects the records?", "Before I show you the system… (video)", "Can management see the overall picture?",
   "Can we drill from a KPI to the records behind it?", "Which manufacturing occurrence are we investigating?", "One record. One key.", "Once we find the right record, what can we see?",

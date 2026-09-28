@@ -84,7 +84,7 @@
   "next": "So let me take you into the plant."
  },
  {
-  "say": "I did my internship with JHS Svendgaard Laboratories, in the Operations department at their Kala-Amb plant in Himachal Pradesh. JHS is an oral-care manufacturer making toothpaste, toothbrushes and mouthwash, with its corporate office in New Delhi. I spent my time on the floor, understanding how planning, stores, production, QC, packing and dispatch actually work day to day.",
+  "say": "I did my internship with JHS Svendgaard Laboratories, in the Operations department at their Kala-Amb plant in Himachal Pradesh.  I spent my time on the floor, understanding how planning, stores, production, QC, packing and dispatch actually work day to day.",
   "why": "The panel needs to know this is grounded in a real plant. The system was designed around JHS's actual flow.",
   "notice": "The aerial view: several production blocks, warehousing and utilities on one campus. Information has to move between all of them.",
   "q": [
@@ -93,32 +93,20 @@
     "I was an operations intern. I studied the process, observed a production line, gathered requirements from the people using the records, and designed and built the MES prototype."
    ]
   ],
-  "next": "The first thing I tried to understand was how material physically moves through the plant."
+  "next": "Let me tell you briefly who JHS is."
  },
  {
-  "say": "This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.",
-  "why": "This is where I realised the problem wasn't a lack of data.",
-  "notice": "Six stages, six records. The link between them is the part that's missing.",
+  "say": "Briefly, who JHS is. JHS Svendgaard started in 1997 as a toothbrush manufacturer and today makes the full oral-care range. A large part of its business is contract manufacturing: it makes toothpaste, toothbrushes and mouthwash for other brands, in India and abroad, as well as its own. The manufacturing is at Kala-Amb, where I was, and the corporate office is in New Delhi. The three product lines work very differently. Toothpaste runs on high-volume lines: dispensing, blending, homogenisation, then tube filling. A toothbrush is assembled from components: the handle is moulded, bristles are tufted and trimmed, then the cap goes on and it's packed. Mouthwash is a lower-volume, order-based single line. The point for my project is the last line on the slide. When the product carries a client's brand, a complaint is the client's complaint too, so traceability is part of the relationship, not an admin task.",
+  "why": "It sets up why traceability matters commercially, not just operationally, before the panel sees any problem.",
+  "notice": "The toothbrush line, highlighted, is the one the whole case study follows.",
   "q": [
    [
-    "How did you map this flow?",
-    "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."
-   ]
-  ],
-  "next": "During the induction I spent time in three plants in particular, and each one changed what the system had to do."
- },
- {
-  "say": "This slide is the one the design rests on. My exposure was observational: I was there to understand where information is created, not to run equipment. In the paste plant, I saw that material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. I also saw that QC testing and QA release are two different decisions, recorded separately. In moulding, the brush first gets its identity at the handle lot, and one moulding lot feeds up to three assembly runs. That's why reverse traceability matters. And in tufting, bristle retention is decided at the anchoring operation, which is exactly what our complaint is about. The right-hand column is the point: each observation became a specific requirement for the system.",
-  "why": "It shows the design came from the floor, not from a template.",
-  "notice": "Row 03. The complaint from the opening slide leads straight here.",
-  "q": [
-   [
-    "Did you work on the machines?",
-    "No, the exposure was observational. I studied the process and the records each stage creates."
+    "Which brands does JHS make for?",
+    "Publicly, the company names clients such as Amway India and Dabur India in the domestic market. In my workbook, Amway, Chicco and Dabur are modelled as client accounts, but with fictional data."
    ],
    [
-    "What's the difference between QC and QA?",
-    "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."
+    "Why does contract manufacturing make traceability more important?",
+    "Because the brand owner answers to the consumer. If a pack is complained about, the client will expect the manufacturer to identify the run, the materials and the QC record quickly, and to scope any recall precisely."
    ]
   ],
   "next": "Here's what that looks like on the ground."
@@ -133,7 +121,75 @@
     "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."
    ]
   ],
-  "next": "And spending time here is what led me to the real finding."
+  "next": "So how did I spend my seven weeks there?"
+ },
+ {
+  "say": "This is how the seven weeks were spent, from the first of June to the seventeenth of July. It started with a structured plant induction: supply chain, inbound and warehouse, the quality labs, and the paste, moulding and tufting plants. Then I observed one full operating cycle on the main toothpaste line. From that came the problem definition, then the build, then testing and refinement. I want you to notice the order: exposure first, project second. The brief was broad when I arrived. It only took its final shape once I understood how information moves through the plant. My external guide was Mr. Paramveer Singh, and my internal guide was Dr. Vineet Tiwari.",
+  "why": "It shows the project came out of the plant, not the other way round. It also answers \"what did you actually do all day?\" before anyone asks.",
+  "notice": "The first bar, the induction, is highlighted. Everything else depended on it.",
+  "q": [
+   [
+    "How much time did the induction take?",
+    "It was the first part of the internship. I haven't put exact weeks on the slide because the phases overlapped. For example, I kept going back to the floor while building."
+   ],
+   [
+    "Was the MES your assigned project from day one?",
+    "No. The brief was broad: understand how the plant operates and how information moves, then translate that into a working digital system. The MES took shape after the induction and the line study."
+   ]
+  ],
+  "next": "The induction came first, and it taught me things I didn't expect."
+ },
+ {
+  "say": "Before the project had a shape, the induction taught me how the functions around production work. In planning and procurement, planning and buying are deliberately kept separate: the plan says what's needed, procurement decides how to get it. At the inbound gate, a material gets its traceable identity before it's allowed into storage: it's verified, weighed, quarantined, sampled and labelled. In the QC lab, I learned that testing a material and releasing a batch are two different decisions, recorded separately. In QA, line clearance is graded, A and B, and a retained sample of every batch is kept through expiry, so a complaint months later can be checked against physical evidence. And the plant already measures its own losses through OEE and TPM. The common thread, and probably the most useful thing I learned there: every record exists because some later activity is going to need it.",
+  "why": "This is manufacturing knowledge I didn't have before the internship, and each point later shaped a specific part of the system.",
+  "notice": "The orange line at the bottom of each card. That's where the learning ended up in the MES.",
+  "q": [
+   [
+    "What's the difference between QC and QA?",
+    "QC tests: it checks a material or product against specification and records the result. QA decides: it reviews the batch record, line clearance and QC results, and releases or holds the batch. They're separate decisions, so the MES keeps QC status and release status as separate fields."
+   ],
+   [
+    "What is line clearance?",
+    "Before a new batch starts, the line is checked and cleared of the previous product's materials, labels and documents, so nothing gets mixed up. At JHS it's graded into A and B levels. (Explain the A/B criteria as the plant's SOP defines them.)"
+   ],
+   [
+    "Why keep a retained sample?",
+    "So that if a complaint arrives months later, QA can test the same batch against what the customer reports. It's physical evidence to go with the records."
+   ],
+   [
+    "What is TPM?",
+    "Total Productive Maintenance: an approach where operators and maintenance work together to prevent losses, such as breakdowns, minor stops and speed loss, rather than only fixing failures. OEE is the measure it uses."
+   ]
+  ],
+  "next": "Then came the three plants, where the product is actually made."
+ },
+ {
+  "say": "Then the three plants. This slide is the one the design rests on. My exposure was observational: I was there to understand where information is created, not to run equipment. In the paste plant, I saw that material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. I also saw that QC testing and QA release are two different decisions, recorded separately. In moulding, the brush first gets its identity at the handle lot, and one moulding lot feeds up to three assembly runs. That's why reverse traceability matters. And in tufting, bristle retention is decided at the anchoring operation, which is exactly what our complaint is about. The right-hand column is the point: each observation became a specific requirement for the system.",
+  "why": "It shows the design came from the floor, not from a template.",
+  "notice": "Row 03. The complaint from the opening slide leads straight here.",
+  "q": [
+   [
+    "Did you work on the machines?",
+    "No, the exposure was observational. I studied the process and the records each stage creates."
+   ],
+   [
+    "What's the difference between QC and QA?",
+    "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."
+   ]
+  ],
+  "next": "Put together, this is how material moves through the plant."
+ },
+ {
+  "say": "This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.",
+  "why": "This is where I realised the problem wasn't a lack of data.",
+  "notice": "Six stages, six records. The link between them is the part that's missing.",
+  "q": [
+   [
+    "How did you map this flow?",
+    "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."
+   ]
+  ],
+  "next": "And that's what led me to the real finding."
  },
  {
   "say": "This was the most important thing I learned in the first few weeks. The plant had the data. The problem was how the data was connected. I went in expecting to find missing information. What I actually found was information that existed but lived in separate places and couldn't easily be joined.",
