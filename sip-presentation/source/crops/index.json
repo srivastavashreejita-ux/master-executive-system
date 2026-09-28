@@ -1,0 +1,170 @@
+{
+ "dash_top": {
+  "path": "crops/dash_top.png",
+  "ar": 3.6057,
+  "px": [
+   2268,
+   629
+  ]
+ },
+ "prod_full": {
+  "path": "crops/prod_full.png",
+  "ar": 2.6095,
+  "px": [
+   2132,
+   817
+  ]
+ },
+ "prod_drill": {
+  "path": "crops/prod_drill.png",
+  "ar": 6.9734,
+  "px": [
+   1311,
+   188
+  ]
+ },
+ "qual_full": {
+  "path": "crops/qual_full.png",
+  "ar": 2.3293,
+  "px": [
+   2122,
+   911
+  ]
+ },
+ "qual_pareto": {
+  "path": "crops/qual_pareto.png",
+  "ar": 2.2282,
+  "px": [
+   791,
+   355
+  ]
+ },
+ "oee_top": {
+  "path": "crops/oee_top.png",
+  "ar": 3.1441,
+  "px": [
+   2116,
+   673
+  ]
+ },
+ "t6_search": {
+  "path": "crops/t6_search.png",
+  "ar": 29.3654,
+  "px": [
+   3054,
+   104
+  ]
+ },
+ "t6_table": {
+  "path": "crops/t6_table.png",
+  "ar": 5.3966,
+  "px": [
+   1252,
+   232
+  ]
+ },
+ "t1_search": {
+  "path": "crops/t1_search.png",
+  "ar": 29.3654,
+  "px": [
+   3054,
+   104
+  ]
+ },
+ "t1_row": {
+  "path": "crops/t1_row.png",
+  "ar": 14.7294,
+  "px": [
+   1252,
+   85
+  ]
+ },
+ "t1_key": {
+  "path": "crops/t1_key.png",
+  "ar": 21.099,
+  "px": [
+   2131,
+   101
+  ]
+ },
+ "t1_record": {
+  "path": "crops/t1_record.png",
+  "ar": 4.1893,
+  "px": [
+   3054,
+   729
+  ]
+ },
+ "t1_mfg": {
+  "path": "crops/t1_mfg.png",
+  "ar": 2.8889,
+  "px": [
+   884,
+   306
+  ]
+ },
+ "t1_mat": {
+  "path": "crops/t1_mat.png",
+  "ar": 2.4087,
+  "px": [
+   884,
+   367
+  ]
+ },
+ "t1_mach": {
+  "path": "crops/t1_mach.png",
+  "ar": 2.0379,
+  "px": [
+   807,
+   396
+  ]
+ },
+ "c_top": {
+  "path": "crops/c_top.png",
+  "ar": 12.1053,
+  "px": [
+   2530,
+   209
+  ]
+ },
+ "c_L": {
+  "path": "crops/c_L.png",
+  "ar": 2.2266,
+  "px": [
+   786,
+   353
+  ]
+ },
+ "c_R": {
+  "path": "crops/c_R.png",
+  "ar": 4.1147,
+  "px": [
+   1148,
+   279
+  ]
+ },
+ "r_dir1": {
+  "path": "crops/r_dir1.png",
+  "ar": 8.1582,
+  "px": [
+   2888,
+   354
+  ]
+ },
+ "r_dir2": {
+  "path": "crops/r_dir2.png",
+  "ar": 8.553,
+  "px": [
+   2258,
+   264
+  ]
+ },
+ "prod_zoom": {
+  "path": "crops/prod_zoom.png",
+  "ar": 7.4808,
+  "px": [
+   778,
+   104
+  ]
+ }
+}

@@ -1,0 +1,537 @@
+[
+ {
+  "say": "Good morning. Before I tell you about my internship, I want to start with a situation. Imagine a customer sends us a complaint about one of our products. That's where this whole project begins.",
+  "why": "The panel sees a real JHS machine before they see a single bullet point. It signals that this is a story from the shop floor, not a report written from outside.",
+  "notice": "This is an actual photograph from the plant, a tube filling line, not a stock image.",
+  "q": [
+   [
+    "Is this a real complaint?",
+    "No. It's a traceability scenario I used to design and test the system. I'll use it all the way through because it shows exactly what the MES has to do."
+   ]
+  ],
+  "next": "So what does the complaint say?"
+ },
+ {
+  "say": "The complaint is short: \"The bristles are getting off.\" For the customer, that's the whole story. For the plant, it's the start of an investigation. I want to be clear that this is a scenario I built the project around. It isn't a specific complaint that came in while I was there. But it's a very realistic one for a toothbrush manufacturer.",
+  "why": "Bristle retention is a core quality parameter for a toothbrush. It points back to tufting, to materials like filament and anchor wire, to machine settings and to QC checks. So one sentence touches almost every department.",
+  "notice": "The disclaimer at the bottom. I'm not overstating what happened during the internship.",
+  "q": [
+   [
+    "Why this particular complaint?",
+    "Because bristle pull-out can come from the handle material, the filament, the anchor wire or the tufting machine. To answer it you have to connect production, material and quality data, which is exactly what the system does."
+   ],
+   [
+    "Did JHS actually receive such complaints?",
+    "I'm not claiming that. I used it as a design scenario to test whether the system could handle a realistic investigation."
+   ]
+  ],
+  "next": "So the question for the plant is simple to say and hard to answer."
+ },
+ {
+  "say": "How do we find out what happened? To investigate properly, you need to know which production run made this brush, which materials went into it, what QC recorded, which machine and shift were involved, and where else that batch was sent. I'm not going to answer this yet. First, let's look at what we actually have in hand.",
+  "why": "This sets up the rest of the presentation. Everything I built is really an answer to this one question.",
+  "notice": "The questions fade as they go down. The first one, identifying the production run, has to be answered before any of the others.",
+  "q": [
+   [
+    "Isn't this QA's job rather than Operations?",
+    "QA owns the investigation, but it depends on production, warehouse and dispatch records. Operations is where those records are created, so that's where the connection has to be made."
+   ]
+  ],
+  "next": "The only thing we have is the pack. So what does the pack tell us?"
+ },
+ {
+  "say": "From the pack we realistically get four pieces of information. The batch number and manufacturing date are printed on it. The product name is on the front, and the colour you can see from the brush itself. That's all the customer can give us. The whole investigation has to start from these four fields.",
+  "why": "The design of the system starts from what's physically available at the point of complaint, not from what would be convenient to have.",
+  "notice": "Only two of the four fields are actually printed codes. Product and colour come from the pack and the brush.",
+  "q": [
+   [
+    "Why not print the Production Run ID on the pack?",
+    "That would mean changing artwork and coding on the line, which is outside the scope of an internship and needs regulatory and marketing sign-off. So I designed the system to work with what's already printed."
+   ]
+  ],
+  "next": "The obvious move is to search by batch number. But that's where the first problem shows up."
+ },
+ {
+  "say": "Naturally, the first thing you'd do is search by batch number. But batch numbers can repeat. They're printed codes from a finite annual series, so the same number recurs later in the year, often on a different product and a different colour. So a batch-number search can return several records, and you can't tell which one the customer is holding. If you pick the wrong one, you end up investigating the wrong production run. I'll be honest: I didn't know this at the start. I found it while testing the system, and it changed the design.",
+  "why": "This is the key design insight of the project. If the identifier isn't unique, every lookup built on it is unreliable.",
+  "notice": "The same printed batch number maps to more than one manufacturing occurrence.",
+  "q": [
+   [
+    "Why doesn't the plant just make batch numbers unique?",
+    "The batch coding follows the plant's existing convention, and it's tied to printed packaging and regulatory records. Changing it affects many departments. My approach was to leave the printed identifier alone and add a unique key inside the system."
+   ],
+   [
+    "How often did batch numbers actually repeat?",
+    "I didn't do a formal frequency study. The point is structural: the convention allows repeats, so the system can't assume uniqueness."
+   ]
+  ],
+  "next": "So if one field isn't enough, what is?"
+ },
+ {
+  "say": "What actually identifies a single manufacturing occurrence is the combination of batch number, product, colour and manufacturing date. That's the idea behind what became the Trace Report. You enter the four fields from the pack, and it returns only the production records that match all four. But to build that, I couldn't just design a lookup. I had to understand where each of these pieces of information was being created in the plant.",
+  "why": "This is the bridge from the problem to the plant. The requirement came from the complaint, but the solution depended on understanding the process.",
+  "notice": "It's a composite identifier. None of the four fields is unique by itself, but together they point to one run.",
+  "q": [
+   [
+    "What if the four fields still return two records?",
+    "Then the Trace Report shows both, and the investigator uses the next level of detail, like line, shift or time, to narrow it down. The report is designed to show every match rather than silently picking the first one."
+   ],
+   [
+    "Why not just use batch plus date?",
+    "Different products and colours can run on the same date under the same batch convention. Product and colour remove that ambiguity."
+   ]
+  ],
+  "next": "So let me take you into the plant."
+ },
+ {
+  "say": "I did my internship with JHS Svendgaard Laboratories, in the Operations department at their Kala-Amb plant in Himachal Pradesh. JHS is an oral-care manufacturer making toothpaste, toothbrushes and mouthwash, with its corporate office in New Delhi. I spent my time on the floor, understanding how planning, stores, production, QC, packing and dispatch actually work day to day.",
+  "why": "The panel needs to know this is grounded in a real plant. The system was designed around JHS's actual flow.",
+  "notice": "The aerial view: several production blocks, warehousing and utilities on one campus. Information has to move between all of them.",
+  "q": [
+   [
+    "What exactly was your role?",
+    "I was an operations intern. I studied the process, observed a production line, gathered requirements from the people using the records, and designed and built the MES prototype."
+   ]
+  ],
+  "next": "The first thing I tried to understand was how material physically moves through the plant."
+ },
+ {
+  "say": "This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.",
+  "why": "This is where I realised the problem wasn't a lack of data.",
+  "notice": "Six stages, six records. The link between them is the part that's missing.",
+  "q": [
+   [
+    "How did you map this flow?",
+    "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."
+   ]
+  ],
+  "next": "During the induction I spent time in three plants in particular, and each one changed what the system had to do."
+ },
+ {
+  "say": "This slide is the one the design rests on. My exposure was observational: I was there to understand where information is created, not to run equipment. In the paste plant, I saw that material gets a traceable identity at the weighbridge and keeps it through quarantine, sampling and release. I also saw that QC testing and QA release are two different decisions, recorded separately. In moulding, the brush first gets its identity at the handle lot, and one moulding lot feeds up to three assembly runs. That's why reverse traceability matters. And in tufting, bristle retention is decided at the anchoring operation, which is exactly what our complaint is about. The right-hand column is the point: each observation became a specific requirement for the system.",
+  "why": "It shows the design came from the floor, not from a template.",
+  "notice": "Row 03. The complaint from the opening slide leads straight here.",
+  "q": [
+   [
+    "Did you work on the machines?",
+    "No, the exposure was observational. I studied the process and the records each stage creates."
+   ],
+   [
+    "What's the difference between QC and QA?",
+    "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."
+   ]
+  ],
+  "next": "Here's what that looks like on the ground."
+ },
+ {
+  "say": "These are photographs from the plant. On the left is the yard between production blocks, where material moves between stores, production and dispatch all day. Top right is a tube filling line in the paste plant: empty tubes come in from the hopper, then get filled, coded and sealed. Bottom right is the Kala-Amb industrial belt from the roof. Every one of these operations creates records: what was run, what material was used, what was rejected, when the machine stopped.",
+  "why": "It shows the panel I was physically on the floor, and that the system is built around real operations.",
+  "notice": "The scale: several blocks, several lines and several shifts. Connecting the information by hand is slow.",
+  "q": [
+   [
+    "Was the MES deployed on these lines?",
+    "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."
+   ]
+  ],
+  "next": "And spending time here is what led me to the real finding."
+ },
+ {
+  "say": "This was the most important thing I learned in the first few weeks. The plant had the data. The problem was how the data was connected. I went in expecting to find missing information. What I actually found was information that existed but lived in separate places and couldn't easily be joined.",
+  "why": "It changes the solution completely. If data is missing, you collect more. If it's disconnected, you need structure: keys, relationships and a consistent flow.",
+  "notice": "This single sentence reframes the whole project.",
+  "q": [
+   [
+    "Isn't this true of most plants?",
+    "Yes, and that's why it matters. It's a very common problem in plants that run on registers and spreadsheets. The fix isn't more data entry. It's connecting what already exists."
+   ]
+  ],
+  "next": "Let me show you what \"disconnected\" actually meant in practice."
+ },
+ {
+  "say": "These are the five kinds of record I kept coming back to: production, quality, material, downtime and dispatch. Each one made sense on its own. But to answer a question that crosses them, like our complaint, someone has to search each register manually, then consolidate what they find, usually by hand. That delays the investigation, and it means management only sees the full picture when someone has done that work. So the issue was structural. There was no common key and no automatic link between the registers.",
+  "why": "This defines what the MES must fix: a shared key and connected flows, not just a nicer report.",
+  "notice": "The registers are deliberately drawn scattered, with nothing joining them. That's the problem in one picture.",
+  "q": [
+   [
+    "Were these registers on paper or in Excel?",
+    "Both. Each function kept its own departmental register or spreadsheet. The records were generally accurate. The issue was that they weren't connected to each other."
+   ],
+   [
+    "Did you measure how long an investigation took?",
+    "No, I didn't formally time it, so I won't put a number on it. What I observed was the number of steps and hand-offs involved."
+   ]
+  ],
+  "next": "Alongside this, I did a line study, and that gave me a second, more measurable view of the same problem."
+ },
+ {
+  "say": "During the plant induction, I observed one full operating cycle on the main toothpaste line. This is the one figure in the presentation that comes from actual plant observation rather than the demonstration dataset. Two shifts give 720 available minutes. Take away a 30-minute lunch and a 15-minute tea break, and you have 675 effective minutes. At the line's rated speed of 100 units a minute, the ideal is 67,500 units. That's the benchmark: every available minute, at full speed, with no rejects.",
+  "why": "It gives a concrete, measurable baseline, and it separates planned time, which isn't a loss, from actual loss.",
+  "notice": "Planned breaks are removed before calculating the ideal, so the benchmark is fair to the line.",
+  "q": [
+   [
+    "Where did 100 units per minute come from?",
+    "It's the rated speed of that line. In the MES, the equivalent figure is the ideal speed held in the machine master, not typed on each production record."
+   ],
+   [
+    "Why exclude breaks?",
+    "Because they're planned. Loss is measured against the time the line was meant to run, so planned breaks aren't counted as downtime."
+   ],
+   [
+    "Is one cycle enough?",
+    "Not for a performance conclusion, and I don't draw one. It was enough to show me the problem: working out the gap was simple, but explaining it wasn't."
+   ]
+  ],
+  "next": "So what did the line actually produce?"
+ },
+ {
+  "say": "The line actually produced around 40,000 units. That's a gap of about 27,500 units, or roughly 40.7% below the ideal. I want to be careful here: this is one line on one shift that I observed. It's not a statement about JHS's overall performance. What interested me more was that this single number doesn't tell you why. Did the machine stop? Did it run slowly? Were units rejected? Without connected records, you can't split the gap.",
+  "why": "This is the operational version of the same problem. The data exists, but it isn't structured to explain the loss.",
+  "notice": "The caveat. I'm presenting an observation, not a KPI claim about the company.",
+  "q": [
+   [
+    "Is 40% loss normal?",
+    "It's not unusual for a single observed shift to include changeovers, minor stops and speed losses. But I wouldn't generalise from one shift. That would need data across many shifts."
+   ],
+   [
+    "How did you count actual output?",
+    "It's the output registered for that cycle, about 40,000 units. That's why I keep the approximate figure rather than implying false precision."
+   ],
+   [
+    "Why ~ and not exact?",
+    "The actual output was an approximate figure from the shift, so I kept the precision honest."
+   ]
+  ],
+  "next": "At this point I had two problems: a traceability problem and a visibility problem. So I asked myself what a system would need to answer."
+ },
+ {
+  "say": "So instead of starting with Excel, I started with questions. Can I identify the correct production run from a pack? Can I connect production with quality? Can I trace a material forward to see where it went? Can I trace an implicated lot backwards? Can management see production and losses without someone compiling a report? And can I calculate OEE to explain the gap I saw on the line? These six questions became my requirements.",
+  "why": "Requirements came from real questions, not from features I wanted to build. It also gives me a way to test the system: does it answer each question?",
+  "notice": "Questions 1 to 4 are about traceability, from the complaint. Questions 5 and 6 are about performance, from the line study.",
+  "q": [
+   [
+    "How did you validate these requirements?",
+    "By discussing them with the operations team and checking them against the records they actually maintained, so the system could be fed from existing data."
+   ]
+  ],
+  "next": "Getting from these questions to a working system wasn't a straight line."
+ },
+ {
+  "say": "This is how the project actually evolved. The first three stages were about understanding: studying the process, turning it into requirements, and defining the real problem. Only then did I design the system, build it, test it and refine it. It wasn't linear. Several parts were rebuilt as my understanding improved. The biggest change came in testing: I found that batch numbers repeat, so in refinement I reworked the identification logic around four fields and an internal run key. The design changed because the evidence changed it.",
+  "why": "It shows a structured approach and that the design came out of understanding the operation.",
+  "notice": "The build phase starts at stage four.",
+  "q": [
+   [
+    "How long did each phase take?",
+    "I didn't run it as fixed time-boxes. Roughly, the first weeks went on the plant induction, process study and requirements. Building and testing followed, and the identification logic was reworked late, once testing exposed the batch-number problem."
+   ],
+   [
+    "What changed during refinement?",
+    "The traceability logic. The first version searched on batch number. Testing showed the same batch number returning several runs, so I moved to four-field identification with a unique Production Run ID. I also tightened validation: every coded field became a dropdown from master data."
+   ]
+  ],
+  "next": "Let me show you how I structured the system."
+ },
+ {
+  "say": "I organised the workbook into five layers. Master data holds the reference lists: products, colours, machines, materials and ideal speeds. Transaction registers are where daily events are entered: production, quality, material issue, downtime and dispatch. The calculation layer joins and summarises those registers using formulas like SUMIFS, COUNTIFS and INDEX-MATCH. The presentation layer is what users see: dashboards, the trace report and the OEE view. Documentation explains how to use and maintain it. Data flows in one direction, from masters to registers to calculations to outputs.",
+  "why": "Separating reference data, event data and calculations is basic data modelling. It keeps the system consistent and easier to maintain than one big sheet.",
+  "notice": "The calculation layer, highlighted, is where the disconnected registers finally get joined.",
+  "q": [
+   [
+    "Why separate master and transaction data?",
+    "Master data changes rarely and should be entered once. If a product name is typed freely in every register, lookups break. Dropdowns pull from the master, so every register uses the same values."
+   ],
+   [
+    "Why not one big sheet?",
+    "One sheet mixes reference data, events and calculations. It gets slow, hard to validate and easy to break. Layers keep each job separate."
+   ]
+  ],
+  "next": "But the layers only work if the records can be linked. And that needs a key."
+ },
+ {
+  "say": "This is the single most important design decision in the system. The batch number stays exactly as it is. It's printed on the pack and it's what the customer and regulators see. But inside the system, every production run gets its own Production Run ID, which is unique. It looks like PR-2026-00630. Every downstream record, quality checks, material issues, downtime and dispatch, carries that Run ID. So once the Trace Report identifies the right run from the four pack fields, everything else is connected through one key.",
+  "why": "A key must be unique. Batch number is the printed identifier; Production Run ID is the relational key. Separating the two is what makes traceability reliable.",
+  "notice": "Batch Number isn't replaced. The system translates from the printed identifier to the internal key.",
+  "q": [
+   [
+    "Why can't Batch Number be the key?",
+    "Because it can repeat. A key used for lookups must be unique, otherwise INDEX-MATCH returns the first match, which might be the wrong run."
+   ],
+   [
+    "How is the Run ID generated?",
+    "It's assigned when the run is logged in RAW Production, in the format PR-year-sequence. Master Traceability then validates it: a 'Duplicate Run ID' flag if it appears twice, and the production register flags a run with no QC record, an invalid handle lot or a quantity mismatch."
+   ],
+   [
+    "What stops two people creating the same Run ID?",
+    "In the prototype, nothing physically stops it, but Master Traceability has a validation column that flags 'Duplicate Run ID' straight away. In a multi-user system, a database would generate the ID and enforce uniqueness. That's one of the limitations I'll come to."
+   ]
+  ],
+  "next": "I could walk you through each module now. But I think it's easier if you see the flow first."
+ },
+ {
+  "say": "Before I explain the individual modules: may I take approximately 40 seconds to show you a short workflow video? It will make the MES flow easier to understand before I explain the individual modules.\n\n[PLAY VIDEO]\n\nAFTER THE VIDEO: Now that you have seen the overall flow, let me show you what each part is doing.",
+  "why": "Seeing the flow once gives the panel a mental map. The screenshots that follow then make sense as parts of one system instead of isolated sheets.",
+  "notice": "The sequence: master data, registers, dashboard, trace report, retrieved record.",
+  "q": [
+   [
+    "Can we see it live in Excel?",
+    "Yes, I have the workbook open and can show any sheet you'd like after the walkthrough."
+   ]
+  ],
+  "next": "Let's start where a manager would start: the dashboard."
+ },
+ {
+  "say": "This is the management dashboard, where a manager would start. The filter block at the top lets you choose the brand account, plant, shift and date range, and that one filter drives this page and nine others. Below it: actual against planned output, production efficiency, OEE, yield and rejection rate, then downtime and open critical alerts. None of these numbers is typed. Each one is calculated from the production, quality and downtime records under the current filter. And I want to say this clearly: the workbook uses a demonstration dataset, not JHS's production records, so these are not company results.",
+  "why": "It answers requirement five: can management see production and losses without someone compiling a report first?",
+  "notice": "\"Records in scope: 1,529\" at the top right. You always know the basis of the figure you're looking at.",
+  "q": [
+   [
+    "How are the dashboard numbers calculated?",
+    "SUMIFS and COUNTIFS over the calculation layer, using the same four filter criteria. For example, actual production is SUMIFS of total output where brand, shift and date fall within the filter. Ratios like efficiency are a ratio of two SUMIFS, never an average of percentages."
+   ],
+   [
+    "How do the alerts work?",
+    "The Alerts sheet raises exceptions from the records: machine breakdowns above a threshold, batches that failed release, low inventory. Each has a severity, a recommended action, an owner and a status. The dashboard counts the open critical ones."
+   ],
+   [
+    "Is this real data?",
+    "No. It's a demonstration dataset, with Amway, Chicco and Dabur modelled as client accounts and fictional operational data. The design is real; the numbers are for demonstration. The only figure in the deck from actual observation is the line study."
+   ]
+  ],
+  "next": "A dashboard number is only useful if you can go from it to the records behind it."
+ },
+ {
+  "say": "Behind the dashboard sit the modules. On the left is Production: the order book and schedule adherence. The useful part is the drill-down. A production order is a commercial commitment, a production run is a physical event, so if an order is short you can immediately see the runs that produced it, each with its Production Run ID. On the right is Quality: release performance and a defect Pareto. Instead of reporting only a rejection percentage, it ranks defect categories by batches affected, which is the analysis approach I saw used on the floor. Both modules drill down to the individual batches.",
+  "why": "This is requirement two: connecting production with quality. The Run ID appears in both.",
+  "notice": "The orange boxes show where each zoom comes from. The Run ID column in the drill-down is the thread that connects everything.",
+  "q": [
+   [
+    "How do you stop a QC entry pointing to a run that doesn't exist?",
+    "The Run ID in the QC register isn't a dropdown in this version. Instead, validation columns flag problems: 'Run Not In QC', 'Duplicate Run ID', 'Invalid Handle Lot' and 'Quantity Mismatch'. In a database, this would be a foreign-key constraint. It's one of the things I'd strengthen."
+   ],
+   [
+    "Who enters this data?",
+    "The same people who fill the registers today: production supervisors, QC inspectors and dispatch. Users only type into the transaction registers, and coded fields such as product, machine and defect are dropdowns from master data."
+   ]
+  ],
+  "next": "Now back to the complaint. Which manufacturing occurrence are we investigating?"
+ },
+ {
+  "say": "So here's the Trace Report, with our complaint. I've entered only the batch number from the pack, JHS-26433, and left product and colour as \"All\" on purpose. Six production records come back: three different products, four colours, six dates from June to September. Any of them could be the brush the customer is holding. I actually discovered this during testing, not at the design stage. It's why the identification logic was reworked. And the report deliberately returns every match rather than choosing one.",
+  "why": "This is the evidence for the most important design decision in the project.",
+  "notice": "The \"Matching records: 6\" counter. The user knows immediately whether the search has been narrowed enough.",
+  "q": [
+   [
+    "Why do batch numbers repeat?",
+    "They're printed codes drawn from a finite annual series, so the same number comes round again through the year, often on a different product and colour. In the demonstration dataset, 364 batch numbers cover 1,529 runs, and each recurs three to six times."
+   ],
+   [
+    "Which formula finds the matches?",
+    "Each row in Master Traceability has a match flag: 1 if batch, product and colour match (where 'All' acts as a wildcard) and the date is within the range. The report lists the k-th match with INDEX and SMALL(IF(flag=1, row number), k), and the counter is COUNTIF of the flag."
+   ]
+  ],
+  "next": "So let's add what else is on the pack."
+ },
+ {
+  "say": "Now I add the other three fields from the pack: Dabur Red Toothbrush, Medium; colour red; manufacturing date 14 July. Matching records: one. When I open it, the system resolves the unique Production Run ID, PR-2026-00630. That's the hand-off I described earlier: the printed identifier goes in, the internal key comes out, and everything downstream is joined on that key.",
+  "why": "It answers requirement one, and it's the direct answer to the question I opened with.",
+  "notice": "The key is resolved by the system, not typed by the investigator.",
+  "q": [
+   [
+    "What if the four fields still return two records?",
+    "The report shows both, and the investigator picks the right one using the record number. It never silently chooses. In the demonstration data, the four fields were enough to separate every repeat I tested."
+   ],
+   [
+    "Why a date range rather than one date?",
+    "Sometimes the customer's pack is damaged or the date is partly legible, so the report takes a from-to range. When the date is clear, from and to are the same day, as here."
+   ]
+  ],
+  "next": "So what can we see once we have that key?"
+ },
+ {
+  "say": "This is the retrieved manufacturing record for PR-2026-00630. It comes in six blocks: product, manufacturing, production, quality, material genealogy, and machine and dispatch. Below these, the sheet also lists the stoppages logged against the run and the materials issued to it. Before, each of these blocks meant a separate search in a separate register. Now it's one view, and every field is a live lookup on the Run ID from Master Traceability.",
+  "why": "This is the connected story that didn't exist before, and it's the core output of the traceability module.",
+  "notice": "Block 5, material genealogy. That's what makes reverse traceability possible later.",
+  "q": [
+   [
+    "How is all this pulled together?",
+    "Master Traceability holds one consolidated row per production run, 78 columns wide, built from the registers with INDEX-MATCH on the Run ID. The report then looks up that one row."
+   ],
+   [
+    "What is material genealogy?",
+    "It's the record of which input lots went into which output: here the handle lot, the resin grade and lot, masterbatch, mould, bristle supplier and filament reference. It's like a family tree for the product."
+   ]
+  ],
+  "next": "For a bristle complaint specifically, let me zoom into the parts an investigator would look at first."
+ },
+ {
+  "say": "For this complaint, bristles coming out, bristle retention is set at the tufting stage, where the filament is anchored into the handle. That's something I saw in the tufting plant. So QA would look first at where and when it was made: the tufting machine, DBR-TUF-11, shift A, and the operator. Then at what went into it: the handle lot, the bristle supplier and the filament reference. All of it is on one record now, instead of in three registers.",
+  "why": "It connects the system back to what I observed on the floor. The fields in the record were chosen because of what matters in tufting and moulding.",
+  "notice": "These are zoomed crops of the same record, so they're readable.",
+  "q": [
+   [
+    "Does the system tell you the root cause?",
+    "No. It gives the investigator the right record and the connected data. Root-cause analysis is still QA's job. In this demonstration case, the root cause recorded in the complaint register is filament lot moisture above specification."
+   ],
+   [
+    "Why these fields and not others?",
+    "They came from the plant exposure: in tufting, retention depends on the anchoring; in moulding, identity begins at the handle lot. The record was designed around those observations."
+   ]
+  ],
+  "next": "So let's close the loop on the complaint itself."
+ },
+ {
+  "say": "This brings us back to where we started. The Complaint Tool holds the market complaint register. Complaint CMP-26-0024 in the demonstration data says: \"Bristle fall-out during use.\" The complaint is logged with what the customer reported: batch, product, colour, manufacturing date. The Trace Report identifies the run, and the complaint then carries the Production Run ID, PR-2026-00630. So the manufacturing record behind it, the plant, line, machine, shift, operator, handle lot and QC status, is drawn live from Master Traceability. The corrective action is then tracked to closure against it. In this case the recorded root cause is filament lot moisture above specification.",
+  "why": "It closes the loop the opening slide created. The question \"How do we find out what happened?\" now has a concrete path.",
+  "notice": "The flow at the top is the opening story, now running as a system. Reading the pack is still a human step: there's no image recognition anywhere in the project.",
+  "q": [
+   [
+    "Does the system read the customer's photograph?",
+    "No. There's no image recognition, computer vision or automatic batch extraction. Reading the four fields from the pack is a human step that takes a few seconds."
+   ],
+   [
+    "Is CMP-26-0024 a real complaint?",
+    "No. It's a record in the demonstration dataset. I used it because it matches the scenario I opened with."
+   ]
+  ],
+  "next": "And if the investigation implicates a material lot, the question flips: where else did that lot go?"
+ },
+ {
+  "say": "The Reverse Trace sheet works in two directions. Direction one goes from our production run back to its components: the handle lot, resin, masterbatch, mould, bristle supplier, filament and brass wire. Direction two flips it. Take a component lot, here the handle lot HL-DBR-26-0519, and it lists every other run that lot reached: three runs, with 8,698 good units exposed, and where each one was dispatched. That's the recall-readiness question. The scope of a recall is calculated, not estimated. One honest point: in this prototype, direction two is keyed on the handle lot, because that's where a brush's identity begins, and one moulding lot feeds one to three assembly runs. Tracing by filament lot would use exactly the same pattern on a different column.",
+  "why": "Investigating one complaint is useful. Containing a problem across every affected batch is what really protects the customer and the brand.",
+  "notice": "The dispatch numbers in the last column. You can go straight from a suspect lot to the shipments that need to be held or recalled.",
+  "q": [
+   [
+    "What's the difference between forward and reverse traceability?",
+    "Backward, or upstream, goes from a finished product to its inputs: what went into it. Forward, or downstream, goes from an input lot to every product and shipment it reached. In my workbook, the 'Reverse Trace' sheet does both; I call the lot-to-runs direction reverse traceability because it runs opposite to the complaint investigation."
+   ],
+   [
+    "How does it find the runs?",
+    "COUNTIF of the handle lot in Master Traceability gives the number of runs, SUMIFS of good quantity gives the exposure, and INDEX with SMALL(IF(...)) lists each run."
+   ],
+   [
+    "The root cause was a filament lot, but you traced a handle lot. Why?",
+    "Because in this version direction two is built on the handle lot. Extending it to the filament AR number is the same formula on another column. I'd add that next."
+   ]
+  ],
+  "next": "So traceability tells us where a product came from. But there was a second question from the line study."
+ },
+ {
+  "say": "Traceability tells us where a product came from. But the line study raised a different question: how efficiently was it produced? That's what OEE, Overall Equipment Effectiveness, answers. It's Availability times Performance times Quality. Availability is run time over planned production time, so did the line run when it should have? Performance is ideal cycle time times total count over run time, so when it ran, did it run at full speed? Quality is good count over total count, so of what it made, how much was good? Multiply them and you get OEE. It takes the one loss number from the line study and splits it into stops, slow running and rejects.",
+  "why": "A single gap number tells you there's a problem. OEE tells you which kind of problem, which tells you who should act: maintenance, process or quality.",
+  "notice": "Each factor maps to a type of loss. That's why it's useful for managers, not just a formula.",
+  "q": [
+   [
+    "Why multiply rather than average?",
+    "Because losses compound. If you only run 80% of the time, at 90% speed, with 95% good, you only get 0.8 × 0.9 × 0.95 = 68% of ideal good output."
+   ],
+   [
+    "What's a good OEE?",
+    "85% is often quoted as world-class for discrete manufacturing, but I'd use it as a reference point, not a target, without knowing the line and product mix."
+   ],
+   [
+    "Is Performance the same as efficiency?",
+    "No. Performance compares actual speed with ideal speed during run time only. Production efficiency, in my dashboard, compares actual output with planned output."
+   ]
+  ],
+  "next": "Here's how that looks in the system."
+ },
+ {
+  "say": "This is the OEE module. For the filter selected, it shows OEE, 74%, and its three parts: availability 84.6%, performance 89.6% and quality 97.6%. The second row shows where they come from: 733,920 minutes planned, 620,878 minutes actually running, and the downtime split into unplanned and planned. Two technical points matter here. First, ideal speed is a property of the machine, held in the machine master, not typed on the production record. Otherwise performance measures the data entry rather than the equipment. Second, when I combine runs, I add up the minutes and the units first and then divide. That's a ratio of sums, not an average of each run's percentage. And to be explicit: this is calculated from recorded data. There's no SCADA, PLC or IoT connection.",
+  "why": "It connects back to the line study. The single gap now has a structure: how much was stops, how much was speed and how much was rejects.",
+  "notice": "84.6% × 89.6% × 97.6% = 74.0%. The arithmetic can be checked on the slide.",
+  "q": [
+   [
+    "Why ratio of sums instead of average of ratios?",
+    "Averaging percentages gives a short run the same weight as a long one. Say run A is 1 hour at 50% availability and run B is 9 hours at 90%. The simple average is 70%, but the real figure is (0.5 + 8.1) ÷ 10 = 86%. Summing first gives the correct weighted result."
+   ],
+   [
+    "Where do run time and downtime come from?",
+    "Scheduled minutes come from the production record. Every stoppage is logged in the Downtime register as an event with the Run ID, category, reason and minutes. SUMIFS of downtime by Run ID gives the loss, and run time is scheduled minus downtime."
+   ],
+   [
+    "Is 74% good?",
+    "85% is often quoted as world-class, and the dashboard shows it as a reference. But this is demonstration data, so I wouldn't draw a conclusion about JHS from it."
+   ]
+  ],
+  "next": "So, with traceability and OEE in place, what actually changed?"
+ },
+ {
+  "say": "So what changed? Information that used to live in separate registers is now connected through one key. An investigation is a structured retrieval rather than a manual search. Instead of searching by batch number, we identify the run with four fields and a Production Run ID. Reporting comes from a dashboard rather than manual compilation. A single loss number becomes availability, performance and quality. And material investigations can be done with reverse traceability. I haven't put a percentage on any of this, because I didn't formally measure time saved, and I don't want to claim a number I can't defend.",
+  "why": "It's honest about the impact. The change is structural, and that's what the project can defensibly claim.",
+  "notice": "No invented ROI.",
+  "q": [
+   [
+    "So how do you know it's better?",
+    "Each of the six requirements can now be answered from the workbook, which I tested with scenarios. The next step would be to time investigations before and after in a pilot."
+   ],
+   [
+    "How would you measure impact if you had more time?",
+    "Time from complaint to identified run, time to produce the daily report, and the number of manual look-ups per investigation, before and after a pilot."
+   ]
+  ],
+  "next": "Beyond the system, the project taught me a lot."
+ },
+ {
+  "say": "I'd put what I learned at three levels. At the plant level, I learned how a manufacturing operation actually works: how material moves, where records are created, why traceability is a quality obligation and not just a nice-to-have, and where time is really lost on a line. At the system level, I learned data modelling: separating master and transaction data, why a key has to be unique, why validation has to come before calculation, and how to test with realistic scenarios. And at the manager level, I learned that requirements come from users, that a system is only useful if people will actually fill it in, and how to scope a project under real time and tool constraints.",
+  "why": "The learning maps directly to the three things an MBA operations role needs: process knowledge, analytical tools and managing change.",
+  "notice": "Each learning is tied to something specific in the project.",
+  "q": [
+   [
+    "What was the most difficult part?",
+    "Understanding the operation well enough to know which questions mattered, and designing around the fact that batch numbers repeat. The Excel part was easier once that was clear."
+   ],
+   [
+    "What would you do differently?",
+    "I'd involve the end users earlier in testing, and I'd plan a small pilot to measure before-and-after time."
+   ]
+  ],
+  "next": "I also want to be honest about what this system is, and what it isn't."
+ },
+ {
+  "say": "This is a practical, working Excel-based MES prototype. It isn't a full enterprise MES, and I don't want to present it as one. Excel will slow down as the registers grow. It isn't built for many users editing at the same time. There are no user roles and no audit trail. It depends on people entering data correctly, and it doesn't capture data directly from machines. The future path is clear, though. Barcodes or RFID to capture batch and material data at source, SQL for the data layer, IoT for machine run time and counts, integration with ERP, Power BI for reporting, and eventually predictive analytics on downtime and quality.",
+  "why": "Being clear about limits makes the claims I do make more credible.",
+  "notice": "The data model, meaning the masters, the registers and the Run ID, carries over to any of the future platforms. Only the tool changes.",
+  "q": [
+   [
+    "Why Excel then?",
+    "It's what the plant already uses, it needs no new licences or IT approval, and it let me build and test a working prototype within the internship. The design is what matters, and it transfers."
+   ],
+   [
+    "How scalable is this?",
+    "Fine for a prototype and a pilot on a few lines. For plant-wide, multi-user use, the registers should move to a database, with Excel or Power BI on top."
+   ]
+  ],
+  "next": "So, to finish."
+ },
+ {
+  "say": "If I had to sum up the whole internship in one line: the hardest part wasn't building the workbook.\n\n[PAUSE]",
+  "why": "The pause lets the panel anticipate the answer.",
+  "notice": "—",
+  "q": [],
+  "next": "(Advance.)"
+ },
+ {
+  "say": "It was understanding the operation well enough to know what the system needed to answer. Once I understood the plant, I could structure the data. Once the data was structured, traceability was possible. And once it was traceable and measurable, it could support decisions.",
+  "why": "It ties the whole story together: the plant came first, the tool came second.",
+  "notice": "The chain reads left to right as the story of the project.",
+  "q": [
+   [
+    "What was your personal contribution?",
+    "The process study, the line observation, the requirement definition, the data model including the Production Run ID and the four-field trace logic, building all the sheets and formulas, and the testing and refinement."
+   ]
+  ],
+  "next": "So, back to the complaint."
+ },
+ {
+  "say": "We started with a customer saying, \"The bristles are getting off,\" and a plant that had the data but no easy way to connect it. Now, from the four fields on the pack, we can find the right production run, see its materials, quality and machine history, and trace any suspect material to every batch it touched. Thank you. I'm happy to take your questions, or to show you any part of the workbook live.",
+  "why": "It closes the loop the opening created.",
+  "notice": "The ending answers the opening question.",
+  "q": [
+   [
+    "See the viva guide for the full question bank.",
+    "—"
+   ]
+  ],
+  "next": "Questions."
+ }
+]
