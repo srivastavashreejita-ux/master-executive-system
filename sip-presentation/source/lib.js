@@ -26,7 +26,8 @@ function notes(slide, n) {
     `WHY IT MATTERS\n${n.why}\n\n` +
     `WHAT THE PANEL SHOULD NOTICE\n${n.notice}\n\n` +
     `LIKELY PANEL QUESTIONS & MY ANSWERS\n${qa || "—"}\n\n` +
-    `TRANSITION TO NEXT SLIDE\n${n.next}`
+    `TRANSITION TO NEXT SLIDE\n${n.next}` +
+    (n.src ? `\n\nIMAGE SOURCES\n${n.src}` : "")
   );
 }
 
@@ -94,4 +95,15 @@ function frame(slide, x, y, w, h) {
   });
 }
 
-module.exports = { NOTES, C, F, W, H, notes, act, folio, question, pin, legend, frame };
+// Documentary photo or record: white mount + image at its native aspect ratio (w given)
+function photo(slide, path, ar, x, y, w) {
+  const h = w / ar;
+  frame(slide, x - 0.05, y - 0.05, w + 0.1, h + 0.1);
+  slide.addImage({ path, x, y, w, h });
+  return { x, y, w, h };
+}
+function box(slide, r, b, color) {
+  slide.addShape("rect", { x: r.x + b[0] * r.w, y: r.y + b[1] * r.h, w: b[2] * r.w, h: b[3] * r.h,
+    fill: { type: "none" }, line: { color: color || C.signal, width: 2 } });
+}
+module.exports = { photo, box, NOTES, C, F, W, H, notes, act, folio, question, pin, legend, frame };

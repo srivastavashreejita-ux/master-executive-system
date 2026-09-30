@@ -1,6 +1,7 @@
 // Acts 1–8: the question, the investigation, the plant, the discovery,
 // the line study, the requirements, the build, the video.
-const { C, F, W, H, notes, act, folio, question, pin } = require("./lib");
+const { C, F, W, H, notes, act, folio, question, pin, photo, box } = require("./lib");
+const fs = require("fs");
 
 module.exports = function (pres, ctx) {
   const P = ctx.photos;
@@ -26,9 +27,10 @@ module.exports = function (pres, ctx) {
     notes(s, {
       say: `Good morning. Before I tell you about my internship, I want to start with a situation. Imagine a customer sends us a complaint about one of our products. That's where this whole project begins.`,
       why: `The panel sees a real JHS machine before they see a single bullet point. It signals that this is a story from the shop floor, not a report written from outside.`,
-      notice: `This is an actual photograph from the plant, a tube filling line, not a stock image.`,
+      notice: `This is an actual photograph from the plant, the yard between production blocks, not a stock image.`,
       q: [["Is this a real complaint?", "No. It's a traceability scenario I used to design and test the system. I'll use it all the way through because it shows exactly what the MES has to do."]],
       next: `So what does the complaint say?`,
+      src: "Photograph of the plant yard between production blocks, JHS Kala-Amb (image provided by the presenter).",
     });
     folio(s, n++, true);
   }
@@ -240,6 +242,7 @@ module.exports = function (pres, ctx) {
       notice: `The aerial view: several production blocks, warehousing and utilities on one campus. Information has to move between all of them.`,
       q: [["What exactly was your role?", "I was an operations intern. I studied the process, observed a production line, gathered requirements from the people using the records, and designed and built the MES prototype."]],
       next: `Let me tell you briefly who JHS is.`,
+      src: "Aerial view of the JHS Kala-Amb facility (image provided by the presenter; add its original credit if it came from JHS).",
     });
     folio(s, n++);
   }
@@ -256,7 +259,7 @@ module.exports = function (pres, ctx) {
       ["Kala-Amb, Himachal Pradesh", "Manufacturing location, where I was placed. Corporate office in New Delhi."],
     ];
     facts.forEach((f, i) => {
-      const y = 1.75 + i * 1.5;
+      const y = 1.75 + i * 1.25;
       s.addText(f[0], { x: 0.6, y, w: 4.3, h: 0.5, fontFace: F.head, fontSize: 22, color: i === 1 ? C.signal : C.text, margin: 0, isTextBox: true });
       s.addText(f[1], { x: 0.6, y: y + 0.5, w: 4.2, h: 0.85, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
     });
@@ -267,32 +270,47 @@ module.exports = function (pres, ctx) {
       ["Mouthwash", "Lower-volume, order-based", ["Single line"]],
     ];
     lines.forEach((l, i) => {
-      const y = 2.2 + i * 1.3;
-      s.addShape("rect", { x: 5.4, y, w: 7.33, h: 1.1, fill: { color: i === 1 ? C.ink : C.white }, line: { color: i === 1 ? C.ink : C.rule, width: 0.75 } });
+      const y = 2.2 + i * 1.12;
+      s.addShape("rect", { x: 5.4, y, w: 7.33, h: 0.98, fill: { color: i === 1 ? C.ink : C.white }, line: { color: i === 1 ? C.ink : C.rule, width: 0.75 } });
       s.addText([{ text: l[0], options: { bold: true, fontSize: 16, color: i === 1 ? C.white : C.text, breakLine: true } }, { text: l[1], options: { fontSize: 11, color: i === 1 ? "AEB4B9" : C.mute } }],
-        { x: 5.6, y: y + 0.12, w: 1.8, h: 0.86, fontFace: F.body, margin: 0, valign: "middle", isTextBox: true });
+        { x: 5.6, y: y + 0.08, w: 1.8, h: 0.82, fontFace: F.body, margin: 0, valign: "middle", isTextBox: true });
       let cx = 7.45;
       l[2].forEach((st, j) => {
         const w = 0.2 + st.length * 0.068;
-        s.addShape("roundRect", { x: cx, y: y + 0.36, w, h: 0.38, rectRadius: 0.19, fill: { color: i === 1 ? "2A3138" : C.paper }, line: { type: "none" } });
-        s.addText(st, { x: cx, y: y + 0.36, w, h: 0.38, fontFace: F.body, fontSize: 10, color: i === 1 ? C.white : C.text, align: "center", valign: "middle", margin: 0, isTextBox: true });
+        s.addShape("roundRect", { x: cx, y: y + 0.3, w, h: 0.38, rectRadius: 0.19, fill: { color: i === 1 ? "2A3138" : C.paper }, line: { type: "none" } });
+        s.addText(st, { x: cx, y: y + 0.3, w, h: 0.38, fontFace: F.body, fontSize: 10, color: i === 1 ? C.white : C.text, align: "center", valign: "middle", margin: 0, isTextBox: true });
         cx += w + (j < l[2].length - 1 ? 0.16 : 0);
-        if (j < l[2].length - 1) s.addText("›", { x: cx - 0.16, y: y + 0.36, w: 0.16, h: 0.38, fontFace: F.body, fontSize: 12, color: C.signal, align: "center", valign: "middle", margin: 0, isTextBox: true });
+        if (j < l[2].length - 1) s.addText("›", { x: cx - 0.16, y: y + 0.3, w: 0.16, h: 0.38, fontFace: F.body, fontSize: 12, color: C.signal, align: "center", valign: "middle", margin: 0, isTextBox: true });
       });
     });
     s.addText("When you manufacture under other companies' brands, being able to trace any pack back to the run that made it matters to the client as much as to the plant.", {
-      x: 5.4, y: 6.2, w: 7.33, h: 0.75, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, valign: "top", isTextBox: true,
+      x: 5.4, y: 5.5, w: 7.33, h: 0.65, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, valign: "top", isTextBox: true,
     });
+    // Verified contract-manufacturing clients: logo (if supplied in logos/) + name
+    s.addShape("line", { x: 0.6, y: 6.25, w: 12.13, h: 0, line: { color: C.rule, width: 0.75 } });
+    s.addText("CONTRACT-MANUFACTURING CLIENTS, PUBLICLY REPORTED", { x: 0.6, y: 6.38, w: 3.2, h: 0.5, fontFace: F.body, fontSize: 9, bold: true, color: C.mute, charSpacing: 2, margin: 0, valign: "middle", isTextBox: true });
+    ctx.clients.forEach((c, i) => {
+      const x = 4.05 + i * 2.35;
+      const logo = require("path").join(__dirname, "logos", c.logo);
+      let tx = x;
+      if (fs.existsSync(logo)) {
+        s.addImage({ path: logo, x, y: 6.4, w: 0.9, h: 0.46, sizing: { type: "contain", w: 0.9, h: 0.46 } });
+        tx = x + 1.0;
+      }
+      s.addText(c.name, { x: tx, y: 6.38, w: 2.2 - (tx - x), h: 0.5, fontFace: F.head, fontSize: 14, color: C.text, margin: 0, valign: "middle", isTextBox: true });
+    });
+    s.addText("Sources in speaker notes", { x: 11.1, y: 6.95, w: 1.2, h: 0.22, fontFace: F.body, fontSize: 7.5, italic: true, color: C.mute, margin: 0, isTextBox: true });
     folio(s, n++);
     notes(s, {
       say: `Briefly, who JHS is. JHS Svendgaard started in 1997 as a toothbrush manufacturer and today makes the full oral-care range. A large part of its business is contract manufacturing: it makes toothpaste, toothbrushes and mouthwash for other brands, in India and abroad, as well as its own. The manufacturing is at Kala-Amb, where I was, and the corporate office is in New Delhi. The three product lines work very differently. Toothpaste runs on high-volume lines: dispensing, blending, homogenisation, then tube filling. A toothbrush is assembled from components: the handle is moulded, bristles are tufted and trimmed, then the cap goes on and it's packed. Mouthwash is a lower-volume, order-based single line. The point for my project is the last line on the slide. When the product carries a client's brand, a complaint is the client's complaint too, so traceability is part of the relationship, not an admin task.`,
       why: `It sets up why traceability matters commercially, not just operationally, before the panel sees any problem.`,
       notice: `The toothbrush line, highlighted, is the one the whole case study follows.`,
       q: [
-        ["Which brands does JHS make for?", "Publicly, the company names clients such as Amway India and Dabur India in the domestic market. In my workbook, Amway, Chicco and Dabur are modelled as client accounts, but with fictional data."],
+        ["Which brands does JHS make for?", "Publicly reported clients include Dabur India, Patanjali Ayurved and Amway India; those are the three on the slide. The dashboard later in my deck uses Amway, Chicco and Dabur only as modelled accounts with fictional data, so I don't treat the demonstration data as evidence of who the clients are."],
         ["Why does contract manufacturing make traceability more important?", "Because the brand owner answers to the consumer. If a pack is complained about, the client will expect the manufacturer to identify the run, the materials and the QC record quickly, and to scope any recall precisely."],
       ],
       next: `Here's what that looks like on the ground.`,
+      src: ctx.clientSources,
     });
   }
 
@@ -300,26 +318,21 @@ module.exports = function (pres, ctx) {
   {
     const s = pres.addSlide();
     s.background = { color: C.ink };
-    const g = 0.08;
-    s.addImage({ path: P.yard, x: 0, y: 0, w: 8.2, h: H, sizing: { type: "cover", w: 8.2, h: H } });
-    s.addImage({ path: P.machine, x: 8.2 + g, y: 0, w: W - 8.2 - g, h: 3.7, sizing: { type: "cover", w: W - 8.2 - g, h: 3.7 } });
-    s.addImage({ path: P.skyline, x: 8.2 + g, y: 3.7 + g, w: W - 8.2 - g, h: H - 3.7 - g, sizing: { type: "cover", w: W - 8.2 - g, h: H - 3.7 - g } });
+    s.addImage({ path: P.skyline, x: 0, y: 0, w: W, h: H, sizing: { type: "cover", w: W, h: H } });
     s.addShape("rect", { x: 0.45, y: 5.05, w: 7.3, h: 1.95, fill: { color: "000000", transparency: 22 }, line: { type: "none" } });
     s.addText("What does it look like on the ground?", { x: 0.7, y: 5.2, w: 6.9, h: 0.5, fontFace: F.head, fontSize: 22, color: C.white, margin: 0, isTextBox: true });
     s.addText("Stores, production blocks, QC, packing and dispatch spread across one campus. Material moves between them all day, and each hand-over leaves a record behind.", {
       x: 0.7, y: 5.75, w: 6.9, h: 1.1, fontFace: F.body, fontSize: 13, color: "D5D9DC", margin: 0, valign: "top", isTextBox: true,
     });
-    s.addShape("rect", { x: 8.2 + g, y: 3.28, w: W - 8.2 - g, h: 0.42, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
-    s.addText("Tube filling line, paste plant", { x: 8.45, y: 3.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
-    s.addShape("rect", { x: 8.2 + g, y: H - 0.5, w: W - 8.2 - g, h: 0.5, fill: { color: "000000", transparency: 40 }, line: { type: "none" } });
-    s.addText("Kala-Amb industrial belt from the plant roof", { x: 8.45, y: H - 0.36, w: 4.6, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
+    s.addText("Kala-Amb industrial belt from the plant roof", { x: 8.3, y: H - 0.5, w: 4.4, h: 0.25, fontFace: F.body, fontSize: 10, color: C.white, align: "right", margin: 0, isTextBox: true });
     folio(s, n++, true);
     notes(s, {
-      say: `These are photographs from the plant. On the left is the yard between production blocks, where material moves between stores, production and dispatch all day. Top right is a tube filling line in the paste plant: empty tubes come in from the hopper, then get filled, coded and sealed. Bottom right is the Kala-Amb industrial belt from the roof. Every one of these operations creates records: what was run, what material was used, what was rejected, when the machine stopped.`,
+      say: `This is the view from the plant roof: production blocks, stores and utilities, with the Kala-Amb industrial belt and the hills behind. Stores, production, QC, packing and dispatch are spread across the campus, and material moves between them all day. Every one of those operations creates records: what was run, what material was used, what was rejected, when the machine stopped.`,
       why: `It shows the panel I was physically on the floor, and that the system is built around real operations.`,
       notice: `The scale: several blocks, several lines and several shifts. Connecting the information by hand is slow.`,
       q: [["Was the MES deployed on these lines?", "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."]],
       next: `So how did I spend my seven weeks there?`,
+      src: "Photograph from the plant roof, JHS Kala-Amb (image provided by the presenter).",
     });
   }
 
@@ -424,14 +437,23 @@ module.exports = function (pres, ctx) {
       ["02", "Moulding", "A brush first gets its identity at the handle lot. One moulding lot is consumed by one to three assembly runs.", "Carry the handle lot on every production record. Trace a lot to every run it reached."],
       ["03", "Tufting", "Filament is anchored into the handle and trimmed. Bristle retention is decided here.", "Record the tufting machine, bristle supplier, filament and anchor-wire lots, and classify defects by stage."],
     ];
+    const web = ctx.webPhotos || {};
+    const pics = [null, web.moulding, web.tufting];
+    const withPics = pics.some((p) => p);
+    const ox = 2.95, ow = withPics ? 3.5 : 4.7, ax = withPics ? 6.5 : 7.6, mx = withPics ? 6.95 : 8.1, mw = withPics ? 3.4 : 4.6;
     rows.forEach((r, i) => {
       const y = 2.05 + i * 1.55;
       if (i > 0) s.addShape("line", { x: 0.6, y: y - 0.2, w: 12.13, h: 0, line: { color: C.rule, width: 0.75 } });
       s.addText(r[0], { x: 0.6, y, w: 0.8, h: 0.6, fontFace: F.head, fontSize: 28, color: i === 2 ? C.signal : C.faint, margin: 0, valign: "top", isTextBox: true });
       s.addText(r[1], { x: 1.4, y: y + 0.05, w: 1.5, h: 0.5, fontFace: F.head, fontSize: 18, color: C.text, margin: 0, valign: "top", isTextBox: true });
-      s.addText(r[2], { x: 2.95, y, w: 4.7, h: 1.2, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
-      s.addText("→", { x: 7.6, y, w: 0.45, h: 0.45, fontFace: F.body, fontSize: 18, color: C.signal, margin: 0, align: "center", isTextBox: true });
-      s.addText(r[3], { x: 8.1, y, w: 4.6, h: 1.2, fontFace: F.body, fontSize: 13, bold: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
+      s.addText(r[2], { x: ox, y, w: ow, h: 1.2, fontFace: F.body, fontSize: withPics ? 12 : 13, color: C.steel, margin: 0, valign: "top", isTextBox: true });
+      s.addText("\u2192", { x: ax, y, w: 0.45, h: 0.45, fontFace: F.body, fontSize: 18, color: C.signal, margin: 0, align: "center", isTextBox: true });
+      s.addText(r[3], { x: mx, y, w: mw, h: 1.2, fontFace: F.body, fontSize: withPics ? 12 : 13, bold: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
+      const p = pics[i];
+      if (p) {
+        s.addImage({ path: p.path, x: 10.6, y: y - 0.08, w: 2.13, h: 1.12, sizing: { type: "cover", w: 2.13, h: 1.12 } });
+        s.addText(`${p.caption}  \u00B7  ${p.credit}`, { x: 10.6, y: y + 1.07, w: 2.13, h: 0.2, fontFace: F.body, fontSize: 7.5, italic: true, color: C.mute, margin: 0, isTextBox: true });
+      }
     });
     s.addText("Tufting is where the bristle complaint points. Every field on the manufacturing record can be traced back to something seen on the floor.", {
       x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontFace: F.head, fontSize: 15, italic: true, color: C.steel, margin: 0, isTextBox: true,
@@ -446,6 +468,7 @@ module.exports = function (pres, ctx) {
         ["What's the difference between QC and QA?", "QC tests the material or product against specifications. QA decides whether the batch is released. They're different decisions, made by different people, and recorded separately, so the MES keeps them as separate fields."],
       ],
       next: `Put together, this is how material moves through the plant.`,
+      src: (ctx.webPhotos && (ctx.webPhotos.moulding || ctx.webPhotos.tufting)) ? Object.values(ctx.webPhotos).filter(Boolean).map((p) => `${p.caption}: ${p.credit}, ${p.url}`).join("\n") : undefined,
     });
   }
 
@@ -473,20 +496,30 @@ module.exports = function (pres, ctx) {
       s.addShape("ellipse", { x: x, y: yL - 0.25, w: 0.5, h: 0.5, fill: { color: i === 2 ? C.signal : C.ink }, line: { color: C.white, width: 2 } });
       s.addText(String(i + 1), { x, y: yL - 0.25, w: 0.5, h: 0.5, fontFace: F.body, fontSize: 13, bold: true, color: C.white, align: "center", valign: "middle", margin: 0, isTextBox: true });
       s.addText(st[0], { x: x - 0.1, y: 2.25, w: 1.95, h: 0.4, fontFace: F.head, fontSize: 18, color: C.text, margin: 0, isTextBox: true });
-      s.addShape("rect", { x: x - 0.1, y: 3.65, w: 1.85, h: 1.55, fill: { color: C.paper }, line: { type: "none" } });
-      s.addText("RECORD", { x: x + 0.02, y: 3.75, w: 1.6, h: 0.22, fontFace: F.body, fontSize: 8.5, bold: true, color: C.signal, charSpacing: 2, margin: 0, isTextBox: true });
+      s.addShape("rect", { x: x - 0.1, y: 3.55, w: 1.85, h: 1.3, fill: { color: C.paper }, line: { type: "none" } });
+      s.addText("RECORD", { x: x + 0.02, y: 3.63, w: 1.6, h: 0.22, fontFace: F.body, fontSize: 8.5, bold: true, color: C.signal, charSpacing: 2, margin: 0, isTextBox: true });
       s.addText([{ text: st[1], options: { bold: true, color: C.text, breakLine: true } }, { text: st[2], options: { color: C.mute, fontSize: 11 } }],
-        { x: x + 0.02, y: 4.0, w: 1.62, h: 1.1, fontFace: F.body, fontSize: 12.5, margin: 0, valign: "top", isTextBox: true });
+        { x: x + 0.02, y: 3.88, w: 1.62, h: 0.95, fontFace: F.body, fontSize: 12, margin: 0, valign: "top", isTextBox: true });
     });
+    // What two of those records actually look like (plant formats, June 2026)
+    const R = ctx.records;
+    const rp = photo(s, R.params.path, R.params.ar, x0 + 2 * sp - 0.1, 5.02, 2.95);
+    s.addText("At the machine: bristling process-parameter record, 11 Jun, shift A", { x: rp.x, y: rp.y + rp.h + 0.08, w: 3.3, h: 0.22, fontFace: F.body, fontSize: 8.5, italic: true, color: C.mute, margin: 0, isTextBox: true });
+    const rf = photo(s, R.fg13.path, R.fg13.ar, x0 + 4 * sp - 0.1, 5.02, 2.95);
+    s.addText("After packing: FG production record, 13 Jun, shift A", { x: rf.x, y: rf.y + rf.h + 0.08, w: 3.3, h: 0.22, fontFace: F.body, fontSize: 8.5, italic: true, color: C.mute, margin: 0, isTextBox: true });
     s.addText("But those records did not automatically become one connected story.", {
-      x: 0.6, y: 5.85, w: 12, h: 0.55, fontFace: F.head, fontSize: 22, italic: true, color: C.signal, margin: 0, isTextBox: true,
+      x: 0.6, y: 6.6, w: 12, h: 0.45, fontFace: F.head, fontSize: 20, italic: true, color: C.signal, margin: 0, isTextBox: true,
     });
     notes(s, {
-      say: `This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.`,
+      say: `This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. At the bottom are two of them as they actually look: the process-parameter record filled at the bristling machines, and the finished-goods production record filled after packing. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.`,
       why: `This is where I realised the problem wasn't a lack of data.`,
       notice: `Six stages, six records. The link between them is the part that's missing.`,
-      q: [["How did you map this flow?", "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."]],
+      q: [
+        ["How did you map this flow?", "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."],
+        ["What are the two forms at the bottom?", "Real plant formats. On the left, the bristling process-parameter record: speed and pressure for each tufting and trimming machine and the sealing temperatures, checked every shift. On the right, the FG production record: product, brushes per case, batch number and cases packed. They're filled by different people, at different points, on different sheets."],
+      ],
       next: `And that's what led me to the real finding.`,
+      src: "Plant record formats photographed during the internship (provided by the presenter): Bristling Process Parameter Monitoring Record (format JHS/QF/8.5.1-1, 11 Jun 2026, shift A); Production Record - FG (format JHS/QF/8.5.1-1/3, 13 Jun 2026, shift A).",
     });
     folio(s, n++);
   }
@@ -520,20 +553,28 @@ module.exports = function (pres, ctx) {
     s.background = { color: C.white };
     act(s, 4, "The discovery");
     question(s, "Where was the information, and why was it slow to use?", { w: 12.2 });
-    const regs = [
-      ["Production", "Output, shift, line", 0.7, 2.0, -2],
-      ["Quality", "Checks, rejections", 3.25, 2.35, 3],
-      ["Material", "Lots issued", 0.95, 3.75, 2],
-      ["Downtime", "Stops & reasons", 3.55, 4.0, -3],
-      ["Dispatch", "Customer, quantity", 2.1, 5.3, 1],
-    ];
-    regs.forEach((r) => {
-      s.addShape("rect", { x: r[2], y: r[3], w: 2.3, h: 1.2, rotate: r[4], fill: { color: C.paper }, line: { color: C.faint, width: 1 },
-        shadow: { type: "outer", color: "000000", opacity: 0.12, blur: 4, offset: 2, angle: 90 } });
-      s.addText([{ text: r[0], options: { bold: true, fontSize: 16, color: C.text, breakLine: true } }, { text: r[1], options: { fontSize: 11, color: C.mute } }],
-        { x: r[2] + 0.15, y: r[3] + 0.15, w: 2.0, h: 0.9, rotate: r[4], fontFace: F.body, margin: 0, valign: "top", isTextBox: true });
-    });
-    s.addText("Separate registers", { x: 0.7, y: 6.75, w: 4, h: 0.3, fontFace: F.body, fontSize: 10, color: C.mute, italic: true, margin: 0, isTextBox: true });
+    const R = ctx.records;
+    s.addText("PLANT RECORDS, AS I FOUND THEM  \u00B7  JUNE 2026", { x: 0.6, y: 1.55, w: 6.2, h: 0.25, fontFace: F.body, fontSize: 9.5, bold: true, color: C.mute, charSpacing: 2, margin: 0, isTextBox: true });
+    const rt = photo(s, R.trace2.path, R.trace2.ar, 0.6, 1.95, 4.6);
+    box(s, rt, [0.10, 0.268, 0.145, 0.062]); box(s, rt, [0.683, 0.272, 0.3, 0.05]);
+    box(s, rt, [0.0, 0.736, 1.0, 0.097]);
+    pin(s, 1, rt.x + 0.12 * rt.w, rt.y + 0.215 * rt.h, 0.3);
+    pin(s, 2, rt.x + rt.w - 0.02, rt.y + 0.736 * rt.h, 0.3);
+    s.addText([
+      { text: "Traceability report, bristling. ", options: { bold: true, color: C.text } },
+      { text: "Its own headers say where each column comes from: the handle tag, the cap tag, incoming analytical reports, shift production formats. It is compiled by hand.", options: { color: C.steel } },
+    ], { x: 5.38, y: 1.95, w: 1.55, h: 2.6, fontFace: F.body, fontSize: 10, margin: 0, valign: "top", isTextBox: true });
+    const rf = photo(s, R.fg11.path, R.fg11.ar, 0.6, 4.78, 3.5);
+    box(s, rf, [0.09, 0.61, 0.85, 0.095]);
+    pin(s, 2, rf.x + rf.w - 0.02, rf.y + 0.61 * rf.h, 0.3);
+    s.addText([
+      { text: "Written twice. ", options: { bold: true, color: C.signal } },
+      { text: "11 June, JBCA260003, 25 cases: on the FG production record, and again in row 19 of the traceability report.", options: { color: C.steel } },
+    ], { x: 4.35, y: 4.78, w: 2.55, h: 1.3, fontFace: F.body, fontSize: 10.5, margin: 0, valign: "top", isTextBox: true });
+    s.addText([
+      { text: "SEPARATE REGISTERS  ", options: { bold: true, color: C.mute, fontSize: 9, charSpacing: 2 } },
+      { text: "Production \u00B7 Quality \u00B7 Material \u00B7 Downtime \u00B7 Dispatch, each kept by its own function", options: { color: C.text, fontSize: 11.5 } },
+    ], { x: 0.6, y: 6.45, w: 6.3, h: 0.45, fontFace: F.body, margin: 0, valign: "middle", isTextBox: true });
     const chain = ["Manual searching", "Manual consolidation", "Delayed investigation", "Limited visibility"];
     chain.forEach((c, i) => {
       const y = 2.05 + i * 1.02;
@@ -547,14 +588,16 @@ module.exports = function (pres, ctx) {
     ], { x: 10.75, y: 2.05, w: 2.1, h: 3.9, fontFace: F.body, fontSize: 13, margin: 0, valign: "top", isTextBox: true });
     folio(s, n++);
     notes(s, {
-      say: `These are the five kinds of record I kept coming back to: production, quality, material, downtime and dispatch. Each one made sense on its own. But to answer a question that crosses them, like our complaint, someone has to search each register manually, then consolidate what they find, usually by hand. That delays the investigation, and it means management only sees the full picture when someone has done that work. So the issue was structural. There was no common key and no automatic link between the registers.`,
+      say: `These are real records from the bristling line. The first is the plant's own traceability report for Patanjali Triple Action, batch JBCA260003. Look at its headers: this column is 'data received from handle tag', this one 'from cap tag', these 'from shift production formats'. Someone builds this report by hand, from other records. And the same fact gets written twice. On 11 June, 25 cases of JBCA260003: once on the FG production record, and again in row 19 of the traceability report. The same page also shows one batch number running across several production days and colours, which is exactly why the batch number alone couldn't identify a run. Behind these are the five kinds of record I kept coming back to: production, quality, material, downtime and dispatch. Each one made sense on its own. But to answer a question that crosses them, like our complaint, someone has to search each register manually, then consolidate what they find, usually by hand. That delays the investigation, and it means management only sees the full picture when someone has done that work. So the issue was structural. There was no common key and no automatic link between the registers.`,
       why: `This defines what the MES must fix: a shared key and connected flows, not just a nicer report.`,
-      notice: `The registers are deliberately drawn scattered, with nothing joining them. That's the problem in one picture.`,
+      notice: `Marker 2 appears on both records: the same fact, written by hand in two places. Nothing links them except a person copying it.`,
       q: [
-        ["Were these registers on paper or in Excel?", `${ctx.registerFormat}`],
+        ["Were these registers on paper or in Excel?", `${ctx.registerFormat} The two on this slide are paper formats, filled by hand and signed.`],
+        ["Why does one batch number cover several days?", "On this line the batch JBCA260003 ran from 14 May to 13 June, across several production days, colours and handle lots. So a pack's batch number alone can't tell you which day, colour or handle lot you're looking at. That's the real-world version of what I showed with the demonstration data on slide 5."],
         ["Did you measure how long an investigation took?", "No, I didn't formally time it, so I won't put a number on it. What I observed was the number of steps and hand-offs involved."],
       ],
       next: `Alongside this, I did a line study, and that gave me a second, more measurable view of the same problem.`,
+      src: "Plant records photographed during the internship (provided by the presenter): Traceability Report - Bristling, Patanjali Triple Action, batch JBCA260003 (format JHS/QF/8.5.1-1/9), rows 13-21; Production Record - FG, 11 Jun 2026, shift A (format JHS/QF/8.5.1-1/3).",
     });
   }
 
@@ -565,7 +608,7 @@ module.exports = function (pres, ctx) {
     s.background = { color: C.paper };
     s.addImage({ path: P.machine, x: 0, y: 0, w: 3.7, h: H, sizing: { type: "cover", w: 3.7, h: H } });
     s.addShape("rect", { x: 0, y: H - 0.75, w: 3.7, h: 0.75, fill: { color: "000000", transparency: 35 }, line: { type: "none" } });
-    s.addText("Main toothpaste line, paste plant", { x: 0.25, y: H - 0.55, w: 3.3, h: 0.3, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
+    s.addText("Tube filling line, paste plant", { x: 0.25, y: H - 0.55, w: 3.3, h: 0.3, fontFace: F.body, fontSize: 10, color: C.white, margin: 0, isTextBox: true });
     const X = 4.25, Wc = 8.48;
     s.addText([{ text: "ACT 05", options: { bold: true, color: C.signal } }, { text: "   THE LINE STUDY", options: { color: C.mute } }],
       { x: X, y: 0.38, w: 8, h: 0.3, fontFace: F.body, fontSize: 10.5, charSpacing: 3, margin: 0, isTextBox: true });
@@ -612,6 +655,7 @@ module.exports = function (pres, ctx) {
         ["Is one cycle enough?", "Not for a performance conclusion, and I don't draw one. It was enough to show me the problem: working out the gap was simple, but explaining it wasn't."],
       ],
       next: `So what did the line actually produce?`,
+      src: "Tube filling line, paste plant, JHS Kala-Amb (photograph provided by the presenter).",
     });
   }
 
@@ -736,16 +780,16 @@ module.exports = function (pres, ctx) {
     act(s, 7, "The build");
     question(s, "How did I structure it?");
     const L = ctx.layers;
-    const x = 0.6, w0 = 7.4, h = 0.86, g = 0.2, y0 = 1.85;
+    const x = 0.6, w0 = 6.75, h = 0.86, g = 0.2, y0 = 1.85;
     L.forEach((l, i) => {
       const y = y0 + i * (h + g);
       const fills = [C.ink, "2A3138", "3E4750", "56606A", "7A848D"];
       s.addShape("rect", { x, y, w: w0, h, fill: { color: i === 2 ? C.signal : fills[i] }, line: { type: "none" } });
-      s.addText(l[0], { x: x + 0.3, y, w: 3.4, h, fontFace: F.body, fontSize: 15, bold: true, color: C.white, charSpacing: 2, valign: "middle", margin: 0, isTextBox: true });
-      s.addText(l[1], { x: x + 3.6, y, w: w0 - 3.8, h, fontFace: F.body, fontSize: 11.5, color: "E8EAEC", valign: "middle", margin: 0, isTextBox: true });
+      s.addText(l[0], { x: x + 0.3, y, w: 3.1, h, fontFace: F.body, fontSize: 15, bold: true, color: C.white, charSpacing: 2, valign: "middle", margin: 0, isTextBox: true });
+      s.addText(l[1], { x: x + 3.35, y, w: w0 - 3.5, h, fontFace: F.body, fontSize: 10.5, color: "E8EAEC", valign: "middle", margin: 0, isTextBox: true });
       if (i < L.length - 1) s.addText("↓", { x: x + 0.3, y: y + h - 0.02, w: 0.4, h: g + 0.04, fontFace: F.body, fontSize: 11, color: C.mute, margin: 0, align: "left", valign: "middle", isTextBox: true });
     });
-    s.addText("WHAT EACH LAYER DOES", { x: 8.55, y: 1.9, w: 4.2, h: 0.3, fontFace: F.body, fontSize: 10, bold: true, color: C.mute, charSpacing: 2, margin: 0, isTextBox: true });
+    s.addText("WHAT EACH LAYER DOES", { x: 7.75, y: 1.9, w: 5.0, h: 0.3, fontFace: F.body, fontSize: 10, bold: true, color: C.mute, charSpacing: 2, margin: 0, isTextBox: true });
     const roles = [
       ["Master data", "defines the allowed values once."],
       ["Transaction registers", "capture each event against those values."],
@@ -754,12 +798,17 @@ module.exports = function (pres, ctx) {
       ["Documentation", "explains how to use and maintain it."],
     ];
     s.addText(roles.map((r, i) => ({ text: `${r[0]} ${r[1]}`, options: { breakLine: i < roles.length - 1 } })), {
-      x: 8.55, y: 2.3, w: 4.2, h: 3.0, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, valign: "top", paraSpaceAfter: 8, isTextBox: true,
+      x: 7.75, y: 2.25, w: 5.0, h: 2.3, fontFace: F.body, fontSize: 12, color: C.steel, margin: 0, valign: "top", paraSpaceAfter: 5, isTextBox: true,
     });
-    s.addText(ctx.sheetCountLine, { x: 8.55, y: 5.55, w: 4.2, h: 0.8, fontFace: F.head, fontSize: 15, italic: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
+    s.addText(ctx.sheetCountLine, { x: 7.75, y: 4.55, w: 5.0, h: 0.7, fontFace: F.head, fontSize: 14, italic: true, color: C.text, margin: 0, valign: "top", isTextBox: true });
+    const rp = photo(s, ctx.records.trace1.path, ctx.records.trace1.ar, 7.75, 5.5, 2.95);
+    s.addText([
+      { text: "Before: ", options: { bold: true, color: C.text } },
+      { text: "the plant's paper traceability report for the same brush line. Its columns became register fields: handle lot, nylon and brass-wire lots, packing materials, machines.", options: { color: C.steel } },
+    ], { x: 10.9, y: 5.45, w: 1.85, h: 1.55, fontFace: F.body, fontSize: 9.5, margin: 0, valign: "top", isTextBox: true });
     folio(s, n++);
     notes(s, {
-      say: `I organised the workbook into five layers. Master data holds the reference lists: products, colours, machines, materials and ideal speeds. Transaction registers are where daily events are entered: production, quality, material issue, downtime and dispatch. The calculation layer joins and summarises those registers using formulas like SUMIFS, COUNTIFS and INDEX-MATCH. The presentation layer is what users see: dashboards, the trace report and the OEE view. Documentation explains how to use and maintain it. Data flows in one direction, from masters to registers to calculations to outputs.`,
+      say: `I organised the workbook into five layers. Master data holds the reference lists: products, colours, machines, materials and ideal speeds. Transaction registers are where daily events are entered: production, quality, material issue, downtime and dispatch. The calculation layer joins and summarises those registers using formulas like SUMIFS, COUNTIFS and INDEX-MATCH. The presentation layer is what users see: dashboards, the trace report and the OEE view. Documentation explains how to use and maintain it. Data flows in one direction, from masters to registers to calculations to outputs. Bottom right is the plant's own paper traceability report. I used its columns, like handle lot, nylon and brass-wire lots, packing materials and machines, as the fields in my registers, so the system records what the plant already tracks.`,
       why: `Separating reference data, event data and calculations is basic data modelling. It keeps the system consistent and easier to maintain than one big sheet.`,
       notice: `The calculation layer, highlighted, is where the disconnected registers finally get joined.`,
       q: [
@@ -767,6 +816,7 @@ module.exports = function (pres, ctx) {
         ["Why not one big sheet?", "One sheet mixes reference data, events and calculations. It gets slow, hard to validate and easy to break. Layers keep each job separate."],
       ],
       next: `But the layers only work if the records can be linked. And that needs a key.`,
+      src: "Plant record photographed during the internship (provided by the presenter): Traceability Report - Bristling, Patanjali Triple Action, batch JBCA260003 (format JHS/QF/8.5.1-1/9), rows 1-7.",
     });
   }
 

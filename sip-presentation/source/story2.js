@@ -451,21 +451,22 @@ module.exports = function (pres, ctx) {
     act(s, 12, "What I learnt");
     question(s, "What did the project teach me?", { size: 30 });
     const cols = [
-      ["THE PLANT", "Manufacturing understanding", P.machine,
+      ["THE PLANT", "Manufacturing understanding", "01",
         ["How material, people and machines actually move", "Where records are created, and why", "Traceability as a quality obligation", "OEE and where time really goes"]],
-      ["THE SYSTEM", "Technical understanding", S.dash_top.path,
+      ["THE SYSTEM", "Technical understanding", "02",
         ["Data modelling: masters vs. transactions", "Why a system key must be unique", "Validation before calculation", "Testing with real scenarios"]],
-      ["THE MANAGER", "Managerial understanding", P.yard,
+      ["THE MANAGER", "Managerial understanding", "03",
         ["Requirement gathering from users", "A system is only useful if people adopt it", "Scoping under time and tool constraints", "Being honest about what it can't do"]],
     ];
     const cw = 3.85, g = 0.3;
     cols.forEach((c, i) => {
       const x = 0.6 + i * (cw + g);
-      s.addImage({ path: c[2], x, y: 1.6, w: cw, h: 1.7, sizing: { type: "cover", w: cw, h: 1.7 } });
-      s.addText(c[0], { x, y: 3.5, w: cw, h: 0.3, fontFace: F.body, fontSize: 11, bold: true, color: C.signal, charSpacing: 3, margin: 0, isTextBox: true });
-      s.addText(c[1], { x, y: 3.82, w: cw, h: 0.45, fontFace: F.head, fontSize: 19, color: C.text, margin: 0, isTextBox: true });
+      s.addShape("rect", { x, y: 1.75, w: cw, h: 4.75, fill: { color: i === 0 ? C.paper : C.white }, line: { color: C.rule, width: 0.75 } });
+      s.addText(c[2], { x: x + 0.3, y: 1.95, w: 1.5, h: 0.9, fontFace: F.head, fontSize: 48, color: i === 0 ? C.signal : C.faint, margin: 0, valign: "top", isTextBox: true });
+      s.addText(c[0], { x: x + 0.3, y: 3.05, w: cw - 0.6, h: 0.3, fontFace: F.body, fontSize: 11, bold: true, color: C.signal, charSpacing: 3, margin: 0, isTextBox: true });
+      s.addText(c[1], { x: x + 0.3, y: 3.37, w: cw - 0.6, h: 0.45, fontFace: F.head, fontSize: 17, color: C.text, margin: 0, isTextBox: true });
       s.addText(c[3].map((b, j) => ({ text: b, options: { bullet: true, breakLine: j < c[3].length - 1 } })), {
-        x, y: 4.4, w: cw, h: 2.5, fontFace: F.body, fontSize: 13, color: C.steel, margin: 0, paraSpaceAfter: 6, valign: "top", isTextBox: true,
+        x: x + 0.3, y: 4.05, w: cw - 0.6, h: 2.3, fontFace: F.body, fontSize: 14, color: C.steel, margin: 0, paraSpaceAfter: 10, valign: "top", isTextBox: true,
       });
     });
     folio(s, n++);
@@ -576,8 +577,6 @@ module.exports = function (pres, ctx) {
   {
     const s = pres.addSlide();
     s.background = { color: C.ink };
-    s.addImage({ path: P.aerial, x: 0, y: 0, w: W, h: H, sizing: { type: "cover", w: W, h: H } });
-    s.addShape("rect", { x: 0, y: 0, w: W, h: H, fill: { color: "000000", transparency: 25 }, line: { type: "none" } });
     s.addText("“The bristles are getting off.”", { x: 0.6, y: 1.2, w: 12, h: 0.7, fontFace: F.head, fontSize: 26, italic: true, color: "D5D9DC", margin: 0, isTextBox: true });
     s.addText("Now we know where to look.", { x: 0.6, y: 1.9, w: 12, h: 0.7, fontFace: F.head, fontSize: 26, color: C.white, margin: 0, isTextBox: true });
     s.addText("Thank you.", { x: 0.6, y: 4.3, w: 12, h: 1.2, fontFace: F.head, fontSize: 66, color: C.white, margin: 0, isTextBox: true });

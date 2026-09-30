@@ -25,3 +25,13 @@ node viva.js      # writes ../SIP_Viva_Guide.docx (reads notes.json)
 ```
 Requires `pptxgenjs` and `docx` (npm). `render_sheets.py` and `crop.py` regenerate the workbook
 screenshots (LibreOffice + PyMuPDF + Pillow).
+
+## Evidence images (visual pass)
+- **Plant records** (`source/records/`): photographs of real plant formats provided by the presenter, rotated upright and cropped.
+  Used once each: process-parameter record and FG production record (13 Jun) on slide 13; traceability report p.2 and FG production record (11 Jun) on slide 15; traceability report p.1 on slide 20.
+- **No photograph repeats anywhere in the deck.** Zoomed crops of one MES screen appear only on the slide that explains that screen.
+- **Moulding / tufting photos (slide 12):** save the images as `source/photos/moulding.jpg` and `source/photos/tufting.jpg`,
+  copy `photos/web_sources.example.json` to `photos/web_sources.json` with the real caption, credit and URL, then rebuild.
+  Slide 12 switches to its image layout automatically; the source goes into the speaker notes.
+- **Client logos (slide 8):** save official logos as `source/logos/dabur.png`, `patanjali.png`, `amway.png` and rebuild. Without files, the slide shows names only.
+  Clients were verified from public sources (listed in slide 8's speaker notes), not from the demonstration dataset.

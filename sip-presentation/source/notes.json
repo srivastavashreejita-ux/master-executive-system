@@ -2,14 +2,15 @@
  {
   "say": "Good morning. Before I tell you about my internship, I want to start with a situation. Imagine a customer sends us a complaint about one of our products. That's where this whole project begins.",
   "why": "The panel sees a real JHS machine before they see a single bullet point. It signals that this is a story from the shop floor, not a report written from outside.",
-  "notice": "This is an actual photograph from the plant, a tube filling line, not a stock image.",
+  "notice": "This is an actual photograph from the plant, the yard between production blocks, not a stock image.",
   "q": [
    [
     "Is this a real complaint?",
     "No. It's a traceability scenario I used to design and test the system. I'll use it all the way through because it shows exactly what the MES has to do."
    ]
   ],
-  "next": "So what does the complaint say?"
+  "next": "So what does the complaint say?",
+  "src": "Photograph of the plant yard between production blocks, JHS Kala-Amb (image provided by the presenter)."
  },
  {
   "say": "The complaint is short: \"The bristles are getting off.\" For the customer, that's the whole story. For the plant, it's the start of an investigation. I want to be clear that this is a scenario I built the project around. It isn't a specific complaint that came in while I was there. But it's a very realistic one for a toothbrush manufacturer.",
@@ -93,7 +94,8 @@
     "I was an operations intern. I studied the process, observed a production line, gathered requirements from the people using the records, and designed and built the MES prototype."
    ]
   ],
-  "next": "Let me tell you briefly who JHS is."
+  "next": "Let me tell you briefly who JHS is.",
+  "src": "Aerial view of the JHS Kala-Amb facility (image provided by the presenter; add its original credit if it came from JHS)."
  },
  {
   "say": "Briefly, who JHS is. JHS Svendgaard started in 1997 as a toothbrush manufacturer and today makes the full oral-care range. A large part of its business is contract manufacturing: it makes toothpaste, toothbrushes and mouthwash for other brands, in India and abroad, as well as its own. The manufacturing is at Kala-Amb, where I was, and the corporate office is in New Delhi. The three product lines work very differently. Toothpaste runs on high-volume lines: dispensing, blending, homogenisation, then tube filling. A toothbrush is assembled from components: the handle is moulded, bristles are tufted and trimmed, then the cap goes on and it's packed. Mouthwash is a lower-volume, order-based single line. The point for my project is the last line on the slide. When the product carries a client's brand, a complaint is the client's complaint too, so traceability is part of the relationship, not an admin task.",
@@ -102,17 +104,18 @@
   "q": [
    [
     "Which brands does JHS make for?",
-    "Publicly, the company names clients such as Amway India and Dabur India in the domestic market. In my workbook, Amway, Chicco and Dabur are modelled as client accounts, but with fictional data."
+    "Publicly reported clients include Dabur India, Patanjali Ayurved and Amway India; those are the three on the slide. The dashboard later in my deck uses Amway, Chicco and Dabur only as modelled accounts with fictional data, so I don't treat the demonstration data as evidence of who the clients are."
    ],
    [
     "Why does contract manufacturing make traceability more important?",
     "Because the brand owner answers to the consumer. If a pack is complained about, the client will expect the manufacturer to identify the run, the materials and the QC record quickly, and to scope any recall precisely."
    ]
   ],
-  "next": "Here's what that looks like on the ground."
+  "next": "Here's what that looks like on the ground.",
+  "src": "Dabur India, Patanjali Ayurved, Amway India: named as contract-manufacturing clients in JHS Svendgaard's company profile (svendgaard.com/about.html) and investor material (svendgaard.com, Investor Presentation).\nDabur partnership since 2000 and Amway collaboration: Manufacturing Today India, 'No shortcut, only perseverance: JHS Svendgaard's growth story' (manufacturingtodayindia.com/jhs-svendgaards-growth-story).\nAlso listed as portfolio context by Sixth Sense Ventures (sixthsenseventures.com/portfolio/jhs-svendgaard-laboratories/).\nPatanjali products also appear on the plant's own FG production and traceability records photographed during the internship."
  },
  {
-  "say": "These are photographs from the plant. On the left is the yard between production blocks, where material moves between stores, production and dispatch all day. Top right is a tube filling line in the paste plant: empty tubes come in from the hopper, then get filled, coded and sealed. Bottom right is the Kala-Amb industrial belt from the roof. Every one of these operations creates records: what was run, what material was used, what was rejected, when the machine stopped.",
+  "say": "This is the view from the plant roof: production blocks, stores and utilities, with the Kala-Amb industrial belt and the hills behind. Stores, production, QC, packing and dispatch are spread across the campus, and material moves between them all day. Every one of those operations creates records: what was run, what material was used, what was rejected, when the machine stopped.",
   "why": "It shows the panel I was physically on the floor, and that the system is built around real operations.",
   "notice": "The scale: several blocks, several lines and several shifts. Connecting the information by hand is slow.",
   "q": [
@@ -121,7 +124,8 @@
     "No. It's a working prototype built on the plant's process and record structure, and populated with a demonstration dataset, not the company's production records. Live deployment would be the next step."
    ]
   ],
-  "next": "So how did I spend my seven weeks there?"
+  "next": "So how did I spend my seven weeks there?",
+  "src": "Photograph from the plant roof, JHS Kala-Amb (image provided by the presenter)."
  },
  {
   "say": "This is how the seven weeks were spent, from the first of June to the seventeenth of July. It started with a structured plant induction: supply chain, inbound and warehouse, the quality labs, and the paste, moulding and tufting plants. Then I observed one full operating cycle on the main toothpaste line. From that came the problem definition, then the build, then testing and refinement. I want you to notice the order: exposure first, project second. The brief was broad when I arrived. It only took its final shape once I understood how information moves through the plant. My external guide was Mr. Paramveer Singh, and my internal guide was Dr. Vineet Tiwari.",
@@ -180,16 +184,21 @@
   "next": "Put together, this is how material moves through the plant."
  },
  {
-  "say": "This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.",
+  "say": "This is the flow I mapped. Planning decides what to make. The warehouse receives and issues material. Production converts it, QC checks it, packing packs it, and dispatch sends it out. At every step, someone creates a record. At the bottom are two of them as they actually look: the process-parameter record filled at the bristling machines, and the finished-goods production record filled after packing. So the plant isn't short of records. But these records were created by different people, in different formats, at different times. They didn't automatically join up into one story you could follow from a complaint back to a machine and a material lot.",
   "why": "This is where I realised the problem wasn't a lack of data.",
   "notice": "Six stages, six records. The link between them is the part that's missing.",
   "q": [
    [
     "How did you map this flow?",
     "By walking the process, talking to the people in each function, and looking at the registers and formats they actually filled in."
+   ],
+   [
+    "What are the two forms at the bottom?",
+    "Real plant formats. On the left, the bristling process-parameter record: speed and pressure for each tufting and trimming machine and the sealing temperatures, checked every shift. On the right, the FG production record: product, brushes per case, batch number and cases packed. They're filled by different people, at different points, on different sheets."
    ]
   ],
-  "next": "And that's what led me to the real finding."
+  "next": "And that's what led me to the real finding.",
+  "src": "Plant record formats photographed during the internship (provided by the presenter): Bristling Process Parameter Monitoring Record (format JHS/QF/8.5.1-1, 11 Jun 2026, shift A); Production Record - FG (format JHS/QF/8.5.1-1/3, 13 Jun 2026, shift A)."
  },
  {
   "say": "This was the most important thing I learned in the first few weeks. The plant had the data. The problem was how the data was connected. I went in expecting to find missing information. What I actually found was information that existed but lived in separate places and couldn't easily be joined.",
@@ -204,20 +213,25 @@
   "next": "Let me show you what \"disconnected\" actually meant in practice."
  },
  {
-  "say": "These are the five kinds of record I kept coming back to: production, quality, material, downtime and dispatch. Each one made sense on its own. But to answer a question that crosses them, like our complaint, someone has to search each register manually, then consolidate what they find, usually by hand. That delays the investigation, and it means management only sees the full picture when someone has done that work. So the issue was structural. There was no common key and no automatic link between the registers.",
+  "say": "These are real records from the bristling line. The first is the plant's own traceability report for Patanjali Triple Action, batch JBCA260003. Look at its headers: this column is 'data received from handle tag', this one 'from cap tag', these 'from shift production formats'. Someone builds this report by hand, from other records. And the same fact gets written twice. On 11 June, 25 cases of JBCA260003: once on the FG production record, and again in row 19 of the traceability report. The same page also shows one batch number running across several production days and colours, which is exactly why the batch number alone couldn't identify a run. Behind these are the five kinds of record I kept coming back to: production, quality, material, downtime and dispatch. Each one made sense on its own. But to answer a question that crosses them, like our complaint, someone has to search each register manually, then consolidate what they find, usually by hand. That delays the investigation, and it means management only sees the full picture when someone has done that work. So the issue was structural. There was no common key and no automatic link between the registers.",
   "why": "This defines what the MES must fix: a shared key and connected flows, not just a nicer report.",
-  "notice": "The registers are deliberately drawn scattered, with nothing joining them. That's the problem in one picture.",
+  "notice": "Marker 2 appears on both records: the same fact, written by hand in two places. Nothing links them except a person copying it.",
   "q": [
    [
     "Were these registers on paper or in Excel?",
-    "Both. Each function kept its own departmental register or spreadsheet. The records were generally accurate. The issue was that they weren't connected to each other."
+    "Both. Each function kept its own departmental register or spreadsheet. The records were generally accurate. The issue was that they weren't connected to each other. The two on this slide are paper formats, filled by hand and signed."
+   ],
+   [
+    "Why does one batch number cover several days?",
+    "On this line the batch JBCA260003 ran from 14 May to 13 June, across several production days, colours and handle lots. So a pack's batch number alone can't tell you which day, colour or handle lot you're looking at. That's the real-world version of what I showed with the demonstration data on slide 5."
    ],
    [
     "Did you measure how long an investigation took?",
     "No, I didn't formally time it, so I won't put a number on it. What I observed was the number of steps and hand-offs involved."
    ]
   ],
-  "next": "Alongside this, I did a line study, and that gave me a second, more measurable view of the same problem."
+  "next": "Alongside this, I did a line study, and that gave me a second, more measurable view of the same problem.",
+  "src": "Plant records photographed during the internship (provided by the presenter): Traceability Report - Bristling, Patanjali Triple Action, batch JBCA260003 (format JHS/QF/8.5.1-1/9), rows 13-21; Production Record - FG, 11 Jun 2026, shift A (format JHS/QF/8.5.1-1/3)."
  },
  {
   "say": "During the plant induction, I observed one full operating cycle on the main toothpaste line. This is the one figure in the presentation that comes from actual plant observation rather than the demonstration dataset. Two shifts give 720 available minutes. Take away a 30-minute lunch and a 15-minute tea break, and you have 675 effective minutes. At the line's rated speed of 100 units a minute, the ideal is 67,500 units. That's the benchmark: every available minute, at full speed, with no rejects.",
@@ -237,7 +251,8 @@
     "Not for a performance conclusion, and I don't draw one. It was enough to show me the problem: working out the gap was simple, but explaining it wasn't."
    ]
   ],
-  "next": "So what did the line actually produce?"
+  "next": "So what did the line actually produce?",
+  "src": "Tube filling line, paste plant, JHS Kala-Amb (photograph provided by the presenter)."
  },
  {
   "say": "The line actually produced around 40,000 units. That's a gap of about 27,500 units, or roughly 40.7% below the ideal. I want to be careful here: this is one line on one shift that I observed. It's not a statement about JHS's overall performance. What interested me more was that this single number doesn't tell you why. Did the machine stop? Did it run slowly? Were units rejected? Without connected records, you can't split the gap.",
@@ -288,7 +303,7 @@
   "next": "Let me show you how I structured the system."
  },
  {
-  "say": "I organised the workbook into five layers. Master data holds the reference lists: products, colours, machines, materials and ideal speeds. Transaction registers are where daily events are entered: production, quality, material issue, downtime and dispatch. The calculation layer joins and summarises those registers using formulas like SUMIFS, COUNTIFS and INDEX-MATCH. The presentation layer is what users see: dashboards, the trace report and the OEE view. Documentation explains how to use and maintain it. Data flows in one direction, from masters to registers to calculations to outputs.",
+  "say": "I organised the workbook into five layers. Master data holds the reference lists: products, colours, machines, materials and ideal speeds. Transaction registers are where daily events are entered: production, quality, material issue, downtime and dispatch. The calculation layer joins and summarises those registers using formulas like SUMIFS, COUNTIFS and INDEX-MATCH. The presentation layer is what users see: dashboards, the trace report and the OEE view. Documentation explains how to use and maintain it. Data flows in one direction, from masters to registers to calculations to outputs. Bottom right is the plant's own paper traceability report. I used its columns, like handle lot, nylon and brass-wire lots, packing materials and machines, as the fields in my registers, so the system records what the plant already tracks.",
   "why": "Separating reference data, event data and calculations is basic data modelling. It keeps the system consistent and easier to maintain than one big sheet.",
   "notice": "The calculation layer, highlighted, is where the disconnected registers finally get joined.",
   "q": [
@@ -301,7 +316,8 @@
     "One sheet mixes reference data, events and calculations. It gets slow, hard to validate and easy to break. Layers keep each job separate."
    ]
   ],
-  "next": "But the layers only work if the records can be linked. And that needs a key."
+  "next": "But the layers only work if the records can be linked. And that needs a key.",
+  "src": "Plant record photographed during the internship (provided by the presenter): Traceability Report - Bristling, Patanjali Triple Action, batch JBCA260003 (format JHS/QF/8.5.1-1/9), rows 1-7."
  },
  {
   "say": "This is the single most important design decision in the system. The batch number stays exactly as it is. It's printed on the pack and it's what the customer and regulators see. But inside the system, every production run gets its own Production Run ID, which is unique. It looks like PR-2026-00630. Every downstream record, quality checks, material issues, downtime and dispatch, carries that Run ID. So once the Trace Report identifies the right run from the four pack fields, everything else is connected through one key.",

@@ -13,7 +13,7 @@ pres.title = "From a complaint to a system: SIP at JHS Svendgaard Laboratories";
 const ctx = {
   me: "Shreejita Srivastava",
   programme: "MBA, IIIT Allahabad  ·  IMB2025026  ·  SIP 2026",
-  photos: { opener: path.join(IMG, "4.jpg"), machine: path.join(IMG, "4.jpg"), aerial: path.join(IMG, "1.jpg"), yard: path.join(IMG, "3.jpg"), skyline: path.join(IMG, "2.jpg") },
+  photos: { opener: path.join(IMG, "3.jpg"), machine: path.join(IMG, "4.jpg"), aerial: path.join(IMG, "1.jpg"), yard: path.join(IMG, "3.jpg"), skyline: path.join(IMG, "2.jpg") },
   shots,
   sample: { batch: "JHS-26433", product: "Dabur Red Toothbrush — Medium", productShort: "Dabur Red\nToothbrush\nMedium", colour: "Red", colourHex: "C8322B", mfg: "14-Jul-26", mfgPrinted: "14/07/2026" },
   batchWhy: "Batch numbers are printed codes drawn from a finite annual series. The same number comes round again later in the year, often on a different product and colour.",
@@ -44,6 +44,32 @@ const ctx = {
   runIdFormatSay: "It looks like PR-2026-00630.",
   runIdGen: "It's assigned when the run is logged in RAW Production, in the format PR-year-sequence. Master Traceability then validates it: a 'Duplicate Run ID' flag if it appears twice, and the production register flags a run with no QC record, an invalid handle lot or a quantity mismatch.",
   startNo: 1,
+  // Real plant records photographed during the internship (cropped, upright)
+  records: Object.fromEntries(Object.entries({
+    params: "rec_process_params_11jun_c.jpg", fg13: "rec_fg_production_13jun_c.jpg", fg11: "rec_fg_production_11jun_c.jpg",
+    trace1: "rec_traceability_p1_c.jpg", trace2: "rec_traceability_p2_c.jpg",
+  }).map(([k, f]) => [k, { path: path.join(__dirname, "records", f), ar: require("./records/ratios.json")[f] }])),
+  // Clients verified from public sources (not from the demonstration dataset). Logos are used only if present in logos/.
+  clients: [
+    { name: "Dabur India", logo: "dabur.png" },
+    { name: "Patanjali Ayurved", logo: "patanjali.png" },
+    { name: "Amway India", logo: "amway.png" },
+  ],
+  clientSources: [
+    "Dabur India, Patanjali Ayurved, Amway India: named as contract-manufacturing clients in JHS Svendgaard's company profile (svendgaard.com/about.html) and investor material (svendgaard.com, Investor Presentation).",
+    "Dabur partnership since 2000 and Amway collaboration: Manufacturing Today India, 'No shortcut, only perseverance: JHS Svendgaard's growth story' (manufacturingtodayindia.com/jhs-svendgaards-growth-story).",
+    "Also listed as portfolio context by Sixth Sense Ventures (sixthsenseventures.com/portfolio/jhs-svendgaard-laboratories/).",
+    "Patanjali products also appear on the plant's own FG production and traceability records photographed during the internship.",
+  ].join("\n"),
+  // Optional web photos for the moulding / tufting rows; filled in from photos/web_sources.json when the files exist
+  webPhotos: (() => {
+    const f = path.join(__dirname, "photos", "web_sources.json");
+    if (!require("fs").existsSync(f)) return {};
+    const j = JSON.parse(require("fs").readFileSync(f, "utf8"));
+    const out = {};
+    for (const [k, v] of Object.entries(j)) { const p = path.join(__dirname, "photos", v.file); if (require("fs").existsSync(p)) out[k] = { ...v, path: p }; }
+    return out;
+  })(),
 };
 
 require("./story1")(pres, ctx);
